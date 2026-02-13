@@ -2,6 +2,9 @@ import React, { useEffect, useState, memo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, useCurrentUser } from '../../redux/features/auth/authSlice';
+import { useGetAllMenuQuery } from '../../redux/features/menu/menuApi';
+import { useCreateReservationMutation } from '../../redux/features/reservation/reservationApi';
+import { useCreateOrderMutation } from '../../redux/features/order/orderApi';
 import ThreeScene from "../ThreeScene/ThreeScene";
 import AnimatedBackground from "../AnimatedBackground";
 
@@ -22,7 +25,11 @@ import {
   Users,
   Leaf,
   Wine,
-  LogOut
+  LogOut,
+  ShoppingBag,
+  Plus,
+  Minus,
+  Trash2
 } from
   'lucide-react';
 type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
@@ -45,7 +52,11 @@ export function RestaurantFrontend() {
     navigate('/login');
   };
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeCategory, setActiveCategory] = useState<Category>('All');
+  const menuCategories: Category[] = ['All', 'Appetizers', 'Main Course', 'Desserts', 'Beverages'];
+  const [activeCategory, setActiveCategory] = useState<typeof menuCategories[number]>('All');
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [cart, setCart] = useState<{ item: MenuItem, quantity: number }[]>([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   // Reservation Form State
   const [reservation, setReservation] = useState({
     name: '',
@@ -73,79 +84,78 @@ export function RestaurantFrontend() {
       });
     }
   };
-  const menuItems: MenuItem[] = [
-    {
-      id: '1',
-      name: 'Crispy Calamari',
-      description: 'Served with marinara sauce and lemon wedges',
-      price: 14.0,
-      category: 'Appetizers',
-      available: true
-    },
-    {
-      id: '2',
-      name: 'Bruschetta',
-      description: 'Toasted bread with tomatoes, garlic, basil, and olive oil',
-      price: 10.0,
-      category: 'Appetizers',
-      available: true
-    },
-    {
-      id: '3',
-      name: 'Grilled Salmon',
-      description: 'Atlantic salmon with roasted vegetables and quinoa',
-      price: 26.0,
-      category: 'Main Course',
-      available: true
-    },
-    {
-      id: '4',
-      name: 'Ribeye Steak',
-      description: '12oz steak served with mashed potatoes and asparagus',
-      price: 34.0,
-      category: 'Main Course',
-      available: true
-    },
-    {
-      id: '5',
-      name: 'Mushroom Risotto',
-      description: 'Creamy arborio rice with wild mushrooms and parmesan',
-      price: 22.0,
-      category: 'Main Course',
-      available: false
-    },
-    {
-      id: '6',
-      name: 'Tiramisu',
-      description: 'Classic Italian dessert with coffee-soaked ladyfingers',
-      price: 9.0,
-      category: 'Desserts',
-      available: true
-    },
-    {
-      id: '7',
-      name: 'Cheesecake',
-      description: 'New York style cheesecake with strawberry topping',
-      price: 8.5,
-      category: 'Desserts',
-      available: true
-    },
-    {
-      id: '8',
-      name: 'Craft Beer',
-      description: 'Selection of local craft beers',
-      price: 7.0,
-      category: 'Beverages',
-      available: true
-    },
-    {
-      id: '9',
-      name: 'House Wine',
-      description: 'Red or White, glass',
-      price: 9.0,
-      category: 'Beverages',
-      available: true
-    }];
+  const { data: menuData, isLoading: isMenuLoading } = useGetAllMenuQuery(undefined);
+  const [createReservation, { isLoading: isReserving }] = useCreateReservationMutation();
+  const [createOrder, { isLoading: isOrdering }] = useCreateOrderMutation();
+
+  const menuItems: MenuItem[] = menuData?.data || [];
+
+  const addToCart = (item: MenuItem) => {
+    setCart(prev => {
+      const existing = prev.find(i => i.item.id === item.id);
+      if (existing) {
+        return prev.map(i => i.item.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+      }
+      return [...prev, { item, quantity: 1 }];
+    });
+    setIsCartOpen(true);
+  };
+
+  const removeFromCart = (id: string) => {
+    setCart(prev => prev.filter(i => i.item.id !== id));
+  };
+
+  const updateQuantity = (id: string, delta: number) => {
+    setCart(prev => prev.map(i => {
+      if (i.item.id === id) {
+        const newQty = Math.max(1, i.quantity + delta);
+        return { ...i, quantity: newQty };
+      }
+      return i;
+    }));
+  };
+
+  const cartTotal = cart.reduce((sum, i) => sum + (i.item.price * i.quantity), 0);
+
+  const handlePlaceOrder = async () => {
+    if (cart.length === 0) return;
+    try {
+      await createOrder({
+        items: cart.map(i => ({
+          menuItem: i.item.id,
+          quantity: i.quantity,
+          price: i.item.price
+        })),
+        tableNumber: Math.floor(Math.random() * 20) + 1, // Simulated table for public site
+        totalAmount: cartTotal
+      }).unwrap();
+
+      alert('Order placed successfully! Please visit our restaurant to enjoy your meal.');
+      setCart([]);
+      setIsCartOpen(false);
+    } catch (err: any) {
+      alert(err?.data?.message || 'Failed to place order.');
+    }
+  };
+
+  const handleReservationSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await createReservation(reservation).unwrap();
+      alert('Reservation submitted successfully!');
+      setReservation({
+        name: '',
+        email: '',
+        phone: '',
+        date: '',
+        time: '',
+        guests: '2',
+        requests: ''
+      });
+    } catch (err: any) {
+      alert(err?.data?.message || 'Failed to submit reservation.');
+    }
+  };
 
   const filteredItems =
     activeCategory === 'All' ?
@@ -556,48 +566,158 @@ export function RestaurantFrontend() {
           </div>
 
           {/* Menu Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredItems.map((item) =>
-              <div
-                key={item.id}
-                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
+          {isMenuLoading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredItems.map((item) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
 
-                <div className="h-48 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative overflow-hidden">
-                  <UtensilsCrossed className="w-12 h-12 text-orange-200 group-hover:scale-110 transition-transform duration-500" />
-                  {!item.available &&
-                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
-                      <span className="px-4 py-1 bg-white text-slate-900 text-sm font-bold rounded-full transform -rotate-3 shadow-lg">
-                        Sold Out
+                  <div className="h-48 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative overflow-hidden">
+                    <UtensilsCrossed className="w-12 h-12 text-orange-200 group-hover:scale-110 transition-transform duration-500" />
+                    {!item.available &&
+                      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
+                        <span className="px-4 py-1 bg-white text-slate-900 text-sm font-bold rounded-full transform -rotate-3 shadow-lg">
+                          Sold Out
+                        </span>
+                      </div>
+                    }
+                  </div>
+                  <div className="p-6">
+                    <div className="flex justify-between items-start mb-2">
+                      <h3 className="text-xl font-bold text-slate-900">
+                        {item.name}
+                      </h3>
+                      <span className="text-lg font-bold text-orange-500">
+                        ${item.price}
                       </span>
                     </div>
-                  }
-                </div>
-                <div className="p-6">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-xl font-bold text-slate-900">
-                      {item.name}
-                    </h3>
-                    <span className="text-lg font-bold text-orange-500">
-                      ${item.price}
-                    </span>
-                  </div>
-                  <p className="text-slate-500 text-sm mb-4 line-clamp-2">
-                    {item.description}
-                  </p>
-                  <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                    <span className="text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-600">
-                      {item.category}
-                    </span>
-                    <button className="text-orange-500 hover:text-orange-600 text-sm font-medium flex items-center gap-1 group-hover:gap-2 transition-all">
-                      Details <ArrowRight className="w-4 h-4" />
-                    </button>
+                    <p className="text-slate-500 text-sm mb-4 line-clamp-2">
+                      {item.description}
+                    </p>
+                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+                      <span className="text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+                        {item.category}
+                      </span>
+                      <button
+                        onClick={() => addToCart(item)}
+                        disabled={!item.available}
+                        className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                        <Plus className="w-4 h-4" /> Add
+                      </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </section>
+
+      {/* Cart Drawer */}
+      {isCartOpen && (
+        <div className="fixed inset-0 z-[100] overflow-hidden">
+          <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsCartOpen(false)} />
+          <div className="absolute inset-y-0 right-0 max-w-full flex">
+            <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <ShoppingBag className="w-6 h-6 text-orange-500" />
+                  <h2 className="text-xl font-bold text-slate-800">Your Order</h2>
+                </div>
+                <button onClick={() => setIsCartOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                  <X className="w-6 h-6" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {cart.length === 0 ? (
+                  <div className="h-full flex flex-col items-center justify-center text-center">
+                    <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                      <ShoppingBag className="w-10 h-10 text-slate-300" />
+                    </div>
+                    <p className="text-slate-500 font-medium">Your cart is empty</p>
+                    <button onClick={() => setIsCartOpen(false)} className="mt-4 text-orange-500 font-bold hover:underline">
+                      Explore our menu
+                    </button>
+                  </div>
+                ) : (
+                  cart.map((i) => (
+                    <div key={i.item.id} className="flex gap-4">
+                      <div className="w-20 h-20 bg-slate-100 rounded-xl flex items-center justify-center">
+                        <UtensilsCrossed className="w-8 h-8 text-slate-300" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex justify-between mb-1">
+                          <h4 className="font-bold text-slate-800">{i.item.name}</h4>
+                          <button onClick={() => removeFromCart(i.item.id)} className="text-slate-400 hover:text-red-500">
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-3 bg-slate-50 rounded-lg p-1">
+                            <button onClick={() => updateQuantity(i.item.id, -1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="text-sm font-bold w-4 text-center">{i.quantity}</span>
+                            <button onClick={() => updateQuantity(i.item.id, 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                          <span className="font-bold text-orange-500">${(i.item.price * i.quantity).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {cart.length > 0 && (
+                <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-4">
+                  <div className="flex justify-between text-slate-500 text-sm">
+                    <span>Subtotal</span>
+                    <span>${cartTotal.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-900 font-bold text-lg">
+                    <span>Total</span>
+                    <span>${cartTotal.toFixed(2)}</span>
+                  </div>
+                  <button
+                    onClick={handlePlaceOrder}
+                    disabled={isOrdering}
+                    className="w-full bg-orange-500 text-white py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50"
+                  >
+                    {isOrdering ? 'Placing Order...' : 'Confirm Order'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Cart Button */}
+      {cart.length > 0 && !isCartOpen && (
+        <button
+          onClick={() => setIsCartOpen(true)}
+          className="fixed bottom-8 right-8 z-50 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 hover:scale-105 transition-all group overflow-hidden"
+        >
+          <div className="absolute inset-0 bg-orange-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
+          <div className="relative flex items-center gap-3">
+            <div className="relative">
+              <ShoppingBag className="w-6 h-6" />
+              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-slate-900 group-hover:bg-slate-900 transition-colors">
+                {cart.reduce((s, i) => s + i.quantity, 0)}
+              </span>
+            </div>
+            <span className="font-bold text-sm">View Order • ${cartTotal.toFixed(2)}</span>
+          </div>
+        </button>
+      )}
 
       {/* Reservation Section */}
       <section id="reservations" className="py-20 bg-orange-50">
@@ -618,7 +738,7 @@ export function RestaurantFrontend() {
 
                 <form
                   className="space-y-6"
-                  onSubmit={(e) => e.preventDefault()}>
+                  onSubmit={handleReservationSubmit}>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
@@ -751,8 +871,10 @@ export function RestaurantFrontend() {
                     </textarea>
                   </div>
 
-                  <button className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-lg transition-all shadow-lg shadow-orange-500/20 transform hover:-translate-y-1">
-                    Confirm Reservation
+                  <button
+                    disabled={isReserving}
+                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-lg transition-all shadow-lg shadow-orange-500/20 transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed">
+                    {isReserving ? 'Processing...' : 'Confirm Reservation'}
                   </button>
                 </form>
               </div>
@@ -864,12 +986,12 @@ export function RestaurantFrontend() {
       </section>
 
       {/* Footer */}
-      <footer className="relative bg-slate-900 text-white overflow-hidden">
+      < footer className="relative bg-slate-900 text-white overflow-hidden" >
         {/* Decorative Top Gradient */}
-        <div className="h-1 bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600"></div>
+        < div className="h-1 bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600" ></div >
 
         {/* Decorative Background Elements */}
-        <div className="absolute top-20 right-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl"></div>
+        < div className="absolute top-20 right-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" ></div >
         <div className="absolute bottom-0 left-0 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl"></div>
 
         {/* Main Footer Content */}
@@ -1079,6 +1201,6 @@ export function RestaurantFrontend() {
           </div>
         </div>
       </footer>
-    </div>);
-
+    </div>
+  );
 }

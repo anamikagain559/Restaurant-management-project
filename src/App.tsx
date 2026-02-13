@@ -12,6 +12,25 @@ import { RestaurantFrontend } from './components/frontend/RestaurantFrontend';
 import { Menu, Bell, Search, Globe, LayoutDashboard } from 'lucide-react';
 import { Login } from './components/auth/Login';
 import { Register } from './components/auth/Register';
+import { UserDashboard } from './components/UserDashboard';
+
+// Protected Route Component
+const ProtectedRoute = ({ children, role }: { children: React.ReactNode; role?: string }) => {
+  const user = useSelector(useCurrentUser);
+  console.log('ProtectedRoute check:', { user, requiredRole: role });
+
+  if (!user) {
+    console.log('ProtectedRoute: No user, redirecting to login');
+    return <Navigate to="/login" replace />;
+  }
+
+  if (role && user.role?.toLowerCase() !== role.toLowerCase()) {
+    console.log(`ProtectedRoute: Role mismatch (got ${user.role}, expected ${role}), redirecting to home`);
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
 
 type View = 'dashboard' | 'orders' | 'menu' | 'tables' | 'reservations';
 
@@ -21,7 +40,8 @@ function AdminDashboard() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [mode, setMode] = useState<'admin' | 'frontend'>('admin');
 
-  if (!user || user.role !== 'admin') {
+  if (!user || user.role?.toLowerCase() !== 'admin') {
+    console.log('AdminDashboard: Access denied. User:', user);
     return <Navigate to="/login" replace />;
   }
 
@@ -127,7 +147,22 @@ export function App() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/admin/dashboard" element={<AdminDashboard />} />
+      <Route
+        path="/admin/dashboard"
+        element={
+          <ProtectedRoute role="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/user/dashboard"
+        element={
+          <ProtectedRoute role="user">
+            <UserDashboard />
+          </ProtectedRoute>
+        }
+      />
       <Route path="/*" element={<RestaurantFrontend />} />
     </Routes>
   );

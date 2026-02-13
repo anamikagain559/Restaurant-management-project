@@ -25,12 +25,25 @@ export const Login = () => {
             // Assuming response structure based on user provided controller:
             // { success: true, statusCode: 200, message: "...", data: { accessToken, refreshToken, user } }
 
+            console.log('Login response:', res);
             if (res.success && res.data) {
+                console.log('User data:', res.data.user);
                 dispatch(setUser({
                     user: res.data.user,
                     token: res.data.accessToken
                 }));
-                navigate('/');
+
+                const role = res.data.user.role?.toLowerCase();
+                if (role === 'admin') {
+                    console.log('Navigating to admin dashboard');
+                    navigate('/admin/dashboard');
+                } else if (role === 'user') {
+                    console.log('Navigating to user dashboard');
+                    navigate('/user/dashboard');
+                } else {
+                    console.log('Unknown role:', res.data.user.role);
+                    navigate('/');
+                }
             }
         } catch (err: any) {
             console.error('Login failed:', err);

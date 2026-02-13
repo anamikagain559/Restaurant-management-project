@@ -11,7 +11,7 @@ export const authApi = apiSlice.injectEndpoints({
         }),
         register: builder.mutation({
             query: (userInfo) => ({
-                url: '/auth/register', // Assuming this endpoint based on convention
+                url: '/user/register', // Corrected to match backend route
                 method: 'POST',
                 data: userInfo,
             }),
