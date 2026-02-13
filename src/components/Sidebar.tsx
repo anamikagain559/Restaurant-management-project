@@ -1,4 +1,7 @@
 import React from 'react';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../redux/features/auth/authSlice';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -6,8 +9,9 @@ import {
   Grid3x3,
   CalendarDays,
   LogOut,
-  ChefHat } from
-'lucide-react';
+  ChefHat
+} from
+  'lucide-react';
 type View = 'dashboard' | 'orders' | 'menu' | 'tables' | 'reservations';
 interface SidebarProps {
   activeView: View;
@@ -21,45 +25,54 @@ export function Sidebar({
   isMobileOpen,
   setIsMobileOpen
 }: SidebarProps) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const navItems = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    icon: LayoutDashboard
-  },
-  {
-    id: 'orders',
-    label: 'Orders',
-    icon: ClipboardList
-  },
-  {
-    id: 'menu',
-    label: 'Menu',
-    icon: UtensilsCrossed
-  },
-  {
-    id: 'tables',
-    label: 'Tables',
-    icon: Grid3x3
-  },
-  {
-    id: 'reservations',
-    label: 'Reservations',
-    icon: CalendarDays
-  }] as
-  const;
+    {
+      id: 'dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard
+    },
+    {
+      id: 'orders',
+      label: 'Orders',
+      icon: ClipboardList
+    },
+    {
+      id: 'menu',
+      label: 'Menu',
+      icon: UtensilsCrossed
+    },
+    {
+      id: 'tables',
+      label: 'Tables',
+      icon: Grid3x3
+    },
+    {
+      id: 'reservations',
+      label: 'Reservations',
+      icon: CalendarDays
+    }] as
+    const;
   const sidebarClasses = `
     fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-200 ease-in-out
     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
     md:relative md:translate-x-0
   `;
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
+
   return (
     <>
       {/* Mobile Overlay */}
       {isMobileOpen &&
-      <div
-        className="fixed inset-0 bg-black/50 z-40 md:hidden"
-        onClick={() => setIsMobileOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/50 z-40 md:hidden"
+          onClick={() => setIsMobileOpen(false)} />
 
       }
 
@@ -103,7 +116,9 @@ export function Sidebar({
 
           {/* User Profile / Logout */}
           <div className="p-4 border-t border-slate-800">
-            <button className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Sign Out</span>
             </button>

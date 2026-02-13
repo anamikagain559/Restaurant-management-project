@@ -1,4 +1,10 @@
 import React, { useEffect, useState, memo } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { logout, useCurrentUser } from '../../redux/features/auth/authSlice';
+import ThreeScene from "../ThreeScene/ThreeScene";
+import AnimatedBackground from "../AnimatedBackground";
+
 import {
   UtensilsCrossed,
   ChefHat,
@@ -15,8 +21,10 @@ import {
   Calendar,
   Users,
   Leaf,
-  Wine } from
-'lucide-react';
+  Wine,
+  LogOut
+} from
+  'lucide-react';
 type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
 interface MenuItem {
   id: string;
@@ -27,7 +35,15 @@ interface MenuItem {
   available: boolean;
 }
 export function RestaurantFrontend() {
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const user = useSelector(useCurrentUser);
   const [isScrolled, setIsScrolled] = useState(false);
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate('/login');
+  };
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeCategory, setActiveCategory] = useState<Category>('All');
   // Reservation Form State
@@ -58,83 +74,86 @@ export function RestaurantFrontend() {
     }
   };
   const menuItems: MenuItem[] = [
-  {
-    id: '1',
-    name: 'Crispy Calamari',
-    description: 'Served with marinara sauce and lemon wedges',
-    price: 14.0,
-    category: 'Appetizers',
-    available: true
-  },
-  {
-    id: '2',
-    name: 'Bruschetta',
-    description: 'Toasted bread with tomatoes, garlic, basil, and olive oil',
-    price: 10.0,
-    category: 'Appetizers',
-    available: true
-  },
-  {
-    id: '3',
-    name: 'Grilled Salmon',
-    description: 'Atlantic salmon with roasted vegetables and quinoa',
-    price: 26.0,
-    category: 'Main Course',
-    available: true
-  },
-  {
-    id: '4',
-    name: 'Ribeye Steak',
-    description: '12oz steak served with mashed potatoes and asparagus',
-    price: 34.0,
-    category: 'Main Course',
-    available: true
-  },
-  {
-    id: '5',
-    name: 'Mushroom Risotto',
-    description: 'Creamy arborio rice with wild mushrooms and parmesan',
-    price: 22.0,
-    category: 'Main Course',
-    available: false
-  },
-  {
-    id: '6',
-    name: 'Tiramisu',
-    description: 'Classic Italian dessert with coffee-soaked ladyfingers',
-    price: 9.0,
-    category: 'Desserts',
-    available: true
-  },
-  {
-    id: '7',
-    name: 'Cheesecake',
-    description: 'New York style cheesecake with strawberry topping',
-    price: 8.5,
-    category: 'Desserts',
-    available: true
-  },
-  {
-    id: '8',
-    name: 'Craft Beer',
-    description: 'Selection of local craft beers',
-    price: 7.0,
-    category: 'Beverages',
-    available: true
-  },
-  {
-    id: '9',
-    name: 'House Wine',
-    description: 'Red or White, glass',
-    price: 9.0,
-    category: 'Beverages',
-    available: true
-  }];
+    {
+      id: '1',
+      name: 'Crispy Calamari',
+      description: 'Served with marinara sauce and lemon wedges',
+      price: 14.0,
+      category: 'Appetizers',
+      available: true
+    },
+    {
+      id: '2',
+      name: 'Bruschetta',
+      description: 'Toasted bread with tomatoes, garlic, basil, and olive oil',
+      price: 10.0,
+      category: 'Appetizers',
+      available: true
+    },
+    {
+      id: '3',
+      name: 'Grilled Salmon',
+      description: 'Atlantic salmon with roasted vegetables and quinoa',
+      price: 26.0,
+      category: 'Main Course',
+      available: true
+    },
+    {
+      id: '4',
+      name: 'Ribeye Steak',
+      description: '12oz steak served with mashed potatoes and asparagus',
+      price: 34.0,
+      category: 'Main Course',
+      available: true
+    },
+    {
+      id: '5',
+      name: 'Mushroom Risotto',
+      description: 'Creamy arborio rice with wild mushrooms and parmesan',
+      price: 22.0,
+      category: 'Main Course',
+      available: false
+    },
+    {
+      id: '6',
+      name: 'Tiramisu',
+      description: 'Classic Italian dessert with coffee-soaked ladyfingers',
+      price: 9.0,
+      category: 'Desserts',
+      available: true
+    },
+    {
+      id: '7',
+      name: 'Cheesecake',
+      description: 'New York style cheesecake with strawberry topping',
+      price: 8.5,
+      category: 'Desserts',
+      available: true
+    },
+    {
+      id: '8',
+      name: 'Craft Beer',
+      description: 'Selection of local craft beers',
+      price: 7.0,
+      category: 'Beverages',
+      available: true
+    },
+    {
+      id: '9',
+      name: 'House Wine',
+      description: 'Red or White, glass',
+      price: 9.0,
+      category: 'Beverages',
+      available: true
+    }];
 
   const filteredItems =
-  activeCategory === 'All' ?
-  menuItems :
-  menuItems.filter((item) => item.category === activeCategory);
+    activeCategory === 'All' ?
+      menuItems :
+      menuItems.filter((item) => item.category === activeCategory);
+
+  const navItems = ['Home', 'About', 'Menu', 'Reservations', 'Contact'];
+
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
       {/* Navbar */}
@@ -155,17 +174,32 @@ export function RestaurantFrontend() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-8">
-            {['Home', 'About', 'Menu', 'Reservations', 'Contact'].map(
+            {navItems.map(
               (item) =>
-              <button
-                key={item}
-                onClick={() => scrollToSection(item.toLowerCase())}
-                className={`text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(item.toLowerCase())}
+                  className={`text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
 
                   {item}
                 </button>
-
             )}
+
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className={`flex items-center gap-2 text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className={`text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
+                Login
+              </button>
+            )}
+
             <button
               onClick={() => scrollToSection('reservations')}
               className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-orange-500/20">
@@ -180,30 +214,44 @@ export function RestaurantFrontend() {
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
 
             {isMobileMenuOpen ?
-            <X className="w-6 h-6" /> :
+              <X className="w-6 h-6" /> :
 
-            <MenuIcon className="w-6 h-6" />
+              <MenuIcon className="w-6 h-6" />
             }
           </button>
         </div>
 
         {/* Mobile Nav */}
         {isMobileMenuOpen &&
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg border-t border-slate-100 p-4 flex flex-col gap-4">
-            {['Home', 'About', 'Menu', 'Reservations', 'Contact'].map(
-            (item) =>
-            <button
-              key={item}
-              onClick={() => scrollToSection(item.toLowerCase())}
-              className="text-left text-slate-600 font-medium py-2 hover:text-orange-500">
-
+          <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg border-t border-slate-100 p-4 flex flex-col gap-4">
+            {navItems.map(
+              (item) =>
+                <button
+                  key={item}
+                  onClick={() => scrollToSection(item.toLowerCase())}
+                  className="text-left text-slate-600 font-medium py-2 hover:text-orange-500">
                   {item}
                 </button>
+            )}
 
-          )}
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="text-left text-slate-600 font-medium py-2 hover:text-orange-500 flex items-center gap-2">
+                <LogOut className="w-4 h-4" />
+                Logout
+              </button>
+            ) : (
+              <button
+                onClick={() => navigate('/login')}
+                className="text-left text-slate-600 font-medium py-2 hover:text-orange-500 text-left">
+                Login
+              </button>
+            )}
+
             <button
-            onClick={() => scrollToSection('reservations')}
-            className="bg-orange-500 text-white py-3 rounded-lg font-medium text-center">
+              onClick={() => scrollToSection('reservations')}
+              className="bg-orange-500 text-white py-3 rounded-lg font-medium text-center">
 
               Reserve a Table
             </button>
@@ -215,7 +263,7 @@ export function RestaurantFrontend() {
       <section
         id="home"
         className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900">
-
+        <ThreeScene />
         {/* Animated Background Layers */}
         <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-orange-950 z-0"></div>
         <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-30 z-0"></div>
@@ -240,7 +288,7 @@ export function RestaurantFrontend() {
           className="absolute inset-0 opacity-5 z-0"
           style={{
             backgroundImage:
-            'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
+              'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
             backgroundSize: '40px 40px'
           }}>
         </div>
@@ -416,36 +464,37 @@ export function RestaurantFrontend() {
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {[
-                {
-                  icon: Leaf,
-                  title: 'Farm to Table',
-                  desc: 'Fresh local ingredients'
-                },
-                {
-                  icon: ChefHat,
-                  title: 'Expert Chefs',
-                  desc: 'Masterful preparation'
-                },
-                {
-                  icon: Wine,
-                  title: 'Fine Wines',
-                  desc: 'Curated selection'
-                }].
-                map((feature, idx) =>
-                <div
-                  key={idx}
-                  className="bg-slate-50 p-4 rounded-xl border border-slate-100">
+                  {
+                    icon: Leaf,
+                    title: 'Farm to Table',
+                    desc: 'Fresh local ingredients'
+                  },
+                  {
+                    icon: ChefHat,
+                    title: 'Expert Chefs',
+                    desc: 'Masterful preparation'
+                  },
+                  {
+                    icon: Wine,
+                    title: 'Fine Wines',
+                    desc: 'Curated selection'
+                  }].
+                  map((feature, idx) =>
+                    <div
+                      key={idx}
+                      className="bg-slate-50 p-4 rounded-xl border border-slate-100">
 
-                    <feature.icon className="w-8 h-8 text-orange-500 mb-3" />
-                    <h3 className="font-bold text-slate-900 mb-1">
-                      {feature.title}
-                    </h3>
-                    <p className="text-xs text-slate-500">{feature.desc}</p>
-                  </div>
-                )}
+                      <feature.icon className="w-8 h-8 text-orange-500 mb-3" />
+                      <h3 className="font-bold text-slate-900 mb-1">
+                        {feature.title}
+                      </h3>
+                      <p className="text-xs text-slate-500">{feature.desc}</p>
+                    </div>
+                  )}
               </div>
             </div>
             <div className="relative">
+              <AnimatedBackground />
               <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
                 <div className="w-full h-full bg-slate-200 flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center"></div>
               </div>
@@ -485,43 +534,43 @@ export function RestaurantFrontend() {
           {/* Categories */}
           <div className="flex justify-center gap-2 md:gap-4 mb-12 flex-wrap">
             {(
-            [
-            'All',
-            'Appetizers',
-            'Main Course',
-            'Desserts',
-            'Beverages'] as
-            const).
-            map((category) =>
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`
+              [
+                'All',
+                'Appetizers',
+                'Main Course',
+                'Desserts',
+                'Beverages'] as
+              const).
+              map((category) =>
+                <button
+                  key={category}
+                  onClick={() => setActiveCategory(category)}
+                  className={`
                   px-6 py-2 rounded-full text-sm font-medium transition-all
                   ${activeCategory === category ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25 scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}
                 `}>
 
-                {category}
-              </button>
-            )}
+                  {category}
+                </button>
+              )}
           </div>
 
           {/* Menu Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredItems.map((item) =>
-            <div
-              key={item.id}
-              className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
+              <div
+                key={item.id}
+                className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
 
                 <div className="h-48 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative overflow-hidden">
                   <UtensilsCrossed className="w-12 h-12 text-orange-200 group-hover:scale-110 transition-transform duration-500" />
                   {!item.available &&
-                <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
+                    <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
                       <span className="px-4 py-1 bg-white text-slate-900 text-sm font-bold rounded-full transform -rotate-3 shadow-lg">
                         Sold Out
                       </span>
                     </div>
-                }
+                  }
                 </div>
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-2">
@@ -582,10 +631,10 @@ export function RestaurantFrontend() {
                         placeholder="John Doe"
                         value={reservation.name}
                         onChange={(e) =>
-                        setReservation({
-                          ...reservation,
-                          name: e.target.value
-                        })
+                          setReservation({
+                            ...reservation,
+                            name: e.target.value
+                          })
                         } />
 
                     </div>
@@ -599,10 +648,10 @@ export function RestaurantFrontend() {
                         placeholder="(555) 123-4567"
                         value={reservation.phone}
                         onChange={(e) =>
-                        setReservation({
-                          ...reservation,
-                          phone: e.target.value
-                        })
+                          setReservation({
+                            ...reservation,
+                            phone: e.target.value
+                          })
                         } />
 
                     </div>
@@ -620,10 +669,10 @@ export function RestaurantFrontend() {
                           className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
                           value={reservation.date}
                           onChange={(e) =>
-                          setReservation({
-                            ...reservation,
-                            date: e.target.value
-                          })
+                            setReservation({
+                              ...reservation,
+                              date: e.target.value
+                            })
                           } />
 
                       </div>
@@ -638,10 +687,10 @@ export function RestaurantFrontend() {
                           className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all appearance-none bg-white"
                           value={reservation.time}
                           onChange={(e) =>
-                          setReservation({
-                            ...reservation,
-                            time: e.target.value
-                          })
+                            setReservation({
+                              ...reservation,
+                              time: e.target.value
+                            })
                           }>
 
                           <option value="">Select time</option>
@@ -667,15 +716,15 @@ export function RestaurantFrontend() {
                           className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all appearance-none bg-white"
                           value={reservation.guests}
                           onChange={(e) =>
-                          setReservation({
-                            ...reservation,
-                            guests: e.target.value
-                          })
+                            setReservation({
+                              ...reservation,
+                              guests: e.target.value
+                            })
                           }>
 
                           {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
                             (num) =>
-                            <option key={num} value={num}>
+                              <option key={num} value={num}>
                                 {num} {num === 1 ? 'Guest' : 'Guests'}
                               </option>
 
@@ -694,10 +743,10 @@ export function RestaurantFrontend() {
                       placeholder="Allergies, special occasions, seating preferences..."
                       value={reservation.requests}
                       onChange={(e) =>
-                      setReservation({
-                        ...reservation,
-                        requests: e.target.value
-                      })
+                        setReservation({
+                          ...reservation,
+                          requests: e.target.value
+                        })
                       }>
                     </textarea>
                   </div>
@@ -773,43 +822,43 @@ export function RestaurantFrontend() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
-            {
-              icon: MapPin,
-              title: 'Our Location',
-              lines: ['123 Gourmet Avenue', 'Culinary District, NY 10012']
-            },
-            {
-              icon: Clock,
-              title: 'Opening Hours',
-              lines: [
-              'Mon-Thu: 11am - 10pm',
-              'Fri-Sat: 11am - 11pm',
-              'Sun: 10am - 9pm']
+              {
+                icon: MapPin,
+                title: 'Our Location',
+                lines: ['123 Gourmet Avenue', 'Culinary District, NY 10012']
+              },
+              {
+                icon: Clock,
+                title: 'Opening Hours',
+                lines: [
+                  'Mon-Thu: 11am - 10pm',
+                  'Fri-Sat: 11am - 11pm',
+                  'Sun: 10am - 9pm']
 
-            },
-            {
-              icon: Phone,
-              title: 'Get in Touch',
-              lines: ['(555) 123-4567', 'hello@lamaison.com']
-            }].
-            map((item, idx) =>
-            <div
-              key={idx}
-              className="bg-slate-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all border border-slate-100 group">
+              },
+              {
+                icon: Phone,
+                title: 'Get in Touch',
+                lines: ['(555) 123-4567', 'hello@lamaison.com']
+              }].
+              map((item, idx) =>
+                <div
+                  key={idx}
+                  className="bg-slate-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all border border-slate-100 group">
 
-                <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                  <item.icon className="w-8 h-8 text-orange-500" />
+                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                    <item.icon className="w-8 h-8 text-orange-500" />
+                  </div>
+                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                    {item.title}
+                  </h3>
+                  {item.lines.map((line, i) =>
+                    <p key={i} className="text-slate-600">
+                      {line}
+                    </p>
+                  )}
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-4">
-                  {item.title}
-                </h3>
-                {item.lines.map((line, i) =>
-              <p key={i} className="text-slate-600">
-                    {line}
-                  </p>
               )}
-              </div>
-            )}
           </div>
         </div>
       </section>
@@ -856,37 +905,37 @@ export function RestaurantFrontend() {
               </h4>
               <ul className="space-y-4">
                 {[
-                {
-                  label: 'Home',
-                  id: 'home'
-                },
-                {
-                  label: 'About Us',
-                  id: 'about'
-                },
-                {
-                  label: 'Our Menu',
-                  id: 'menu'
-                },
-                {
-                  label: 'Reservations',
-                  id: 'reservations'
-                },
-                {
-                  label: 'Contact',
-                  id: 'contact'
-                }].
-                map((item) =>
-                <li key={item.id}>
-                    <button
-                    onClick={() => scrollToSection(item.id)}
-                    className="text-slate-400 hover:text-orange-400 transition-colors flex items-center gap-2 group">
+                  {
+                    label: 'Home',
+                    id: 'home'
+                  },
+                  {
+                    label: 'About Us',
+                    id: 'about'
+                  },
+                  {
+                    label: 'Our Menu',
+                    id: 'menu'
+                  },
+                  {
+                    label: 'Reservations',
+                    id: 'reservations'
+                  },
+                  {
+                    label: 'Contact',
+                    id: 'contact'
+                  }].
+                  map((item) =>
+                    <li key={item.id}>
+                      <button
+                        onClick={() => scrollToSection(item.id)}
+                        className="text-slate-400 hover:text-orange-400 transition-colors flex items-center gap-2 group">
 
-                      <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-orange-500" />
-                      <span>{item.label}</span>
-                    </button>
-                  </li>
-                )}
+                        <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-orange-500" />
+                        <span>{item.label}</span>
+                      </button>
+                    </li>
+                  )}
               </ul>
             </div>
 
@@ -969,33 +1018,33 @@ export function RestaurantFrontend() {
             <p className="text-slate-500 text-sm">Follow us on social media</p>
             <div className="flex gap-3">
               {[
-              {
-                icon: Instagram,
-                label: 'Instagram',
-                color: 'hover:bg-pink-500'
-              },
-              {
-                icon: Facebook,
-                label: 'Facebook',
-                color: 'hover:bg-blue-600'
-              },
-              {
-                icon: Twitter,
-                label: 'Twitter',
-                color: 'hover:bg-sky-500'
-              }].
-              map((social, i) =>
-              <a
-                key={i}
-                href="#"
-                className={`group flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-full ${social.color} transition-all duration-300`}>
+                {
+                  icon: Instagram,
+                  label: 'Instagram',
+                  color: 'hover:bg-pink-500'
+                },
+                {
+                  icon: Facebook,
+                  label: 'Facebook',
+                  color: 'hover:bg-blue-600'
+                },
+                {
+                  icon: Twitter,
+                  label: 'Twitter',
+                  color: 'hover:bg-sky-500'
+                }].
+                map((social, i) =>
+                  <a
+                    key={i}
+                    href="#"
+                    className={`group flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-full ${social.color} transition-all duration-300`}>
 
-                  <social.icon className="w-4 h-4" />
-                  <span className="text-sm font-medium hidden sm:inline">
-                    {social.label}
-                  </span>
-                </a>
-              )}
+                    <social.icon className="w-4 h-4" />
+                    <span className="text-sm font-medium hidden sm:inline">
+                      {social.label}
+                    </span>
+                  </a>
+                )}
             </div>
           </div>
 
@@ -1007,20 +1056,20 @@ export function RestaurantFrontend() {
             </p>
             <div className="flex items-center gap-6">
               {['Privacy', 'Terms', 'Cookies'].map((item) =>
-              <a
-                key={item}
-                href="#"
-                className="text-slate-500 hover:text-orange-400 text-sm transition-colors">
+                <a
+                  key={item}
+                  href="#"
+                  className="text-slate-500 hover:text-orange-400 text-sm transition-colors">
 
                   {item}
                 </a>
               )}
               <button
                 onClick={() =>
-                window.scrollTo({
-                  top: 0,
-                  behavior: 'smooth'
-                })
+                  window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                  })
                 }
                 className="ml-2 w-10 h-10 bg-slate-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-all group">
 
