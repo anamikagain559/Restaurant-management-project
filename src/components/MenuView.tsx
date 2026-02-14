@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, UtensilsCrossed, Edit2, Trash2, X } from 'lucide-react';
+import { Plus, UtensilsCrossed, Edit2, Trash2, X, Image as ImageIcon, Tag, Hash, DollarSign, AlignLeft, Type, CheckCircle2 } from 'lucide-react';
 import {
   useGetAllMenuQuery,
   useDeleteMenuMutation,
@@ -32,6 +32,7 @@ export function MenuView() {
     description: '',
     price: '',
     category: 'Main Course' as Category,
+    image: '',
     available: true
   });
 
@@ -74,6 +75,7 @@ export function MenuView() {
         description: '',
         price: '',
         category: 'Main Course',
+        image: '',
         available: true
       });
     } catch (err: any) {
@@ -131,17 +133,32 @@ export function MenuView() {
               className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden group hover:shadow-md transition-all"
             >
               <div className="h-40 bg-slate-100 flex items-center justify-center relative">
-                <UtensilsCrossed className="w-10 h-10 text-slate-300" />
-                <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                {item.image ? (
+                  <img
+                    src={item.image}
+                    alt={item.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
+                    }}
+                  />
+                ) : (
+                  <UtensilsCrossed className="w-10 h-10 text-slate-300" />
+                )}
+
+                {/* Actions Overlay */}
+                <div className="absolute top-3 right-3 flex flex-col gap-2">
                   <button
                     onClick={() => console.log('Edit', item.id)}
-                    className="p-2 bg-white rounded-full shadow-sm text-slate-600 hover:text-orange-500"
+                    className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-orange-500 hover:scale-110 transition-all border border-white/20"
+                    title="Edit Item"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
                     onClick={() => handleDelete(item.id)}
-                    className="p-2 bg-white rounded-full shadow-sm text-slate-600 hover:text-red-500"
+                    className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-red-500 hover:scale-110 transition-all border border-white/20"
+                    title="Delete Item"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
@@ -190,53 +207,90 @@ export function MenuView() {
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Name</label>
-                <input
-                  required
-                  type="text"
-                  className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                  value={newItem.name}
-                  onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                <textarea
-                  required
-                  rows={3}
-                  className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none resize-none"
-                  value={newItem.description}
-                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
+            <form onSubmit={handleCreate} className="p-6 space-y-5">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Price ($)</label>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                    <Type className="w-4 h-4 text-orange-500" />
+                    Item Name
+                  </label>
                   <input
                     required
-                    type="number"
-                    step="0.01"
-                    className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none"
-                    value={newItem.price}
-                    onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+                    type="text"
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder:text-slate-400 bg-slate-50/50"
+                    placeholder="E.g. Signature Truffle Pasta"
+                    value={newItem.name}
+                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                   />
                 </div>
+
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">Category</label>
-                  <select
-                    className="w-full px-4 py-2 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none bg-white font-sans"
-                    value={newItem.category}
-                    onChange={(e) => setNewItem({ ...newItem, category: e.target.value as Category })}
-                  >
-                    <option value="Appetizers">Appetizers</option>
-                    <option value="Main Course">Main Course</option>
-                    <option value="Desserts">Desserts</option>
-                    <option value="Beverages">Beverages</option>
-                  </select>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                    <AlignLeft className="w-4 h-4 text-orange-500" />
+                    Description
+                  </label>
+                  <textarea
+                    required
+                    rows={2}
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder:text-slate-400 bg-slate-50/50 resize-none"
+                    placeholder="Short description of the dish..."
+                    value={newItem.description}
+                    onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                      <DollarSign className="w-4 h-4 text-orange-500" />
+                      Price
+                    </label>
+                    <input
+                      required
+                      type="number"
+                      step="0.01"
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-slate-50/50"
+                      value={newItem.price}
+                      onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                      <Tag className="w-4 h-4 text-orange-500" />
+                      Category
+                    </label>
+                    <select
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-slate-50/50 cursor-pointer font-sans"
+                      value={newItem.category}
+                      onChange={(e) => setNewItem({ ...newItem, category: e.target.value as Category })}
+                    >
+                      <option value="Appetizers">Appetizers</option>
+                      <option value="Main Course">Main Course</option>
+                      <option value="Desserts">Desserts</option>
+                      <option value="Beverages">Beverages</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
+                    <ImageIcon className="w-4 h-4 text-orange-500" />
+                    Image URL
+                  </label>
+                  <input
+                    type="url"
+                    placeholder="Paste image link here..."
+                    className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-slate-50/50"
+                    value={newItem.image}
+                    onChange={(e) => setNewItem({ ...newItem, image: e.target.value })}
+                  />
+                </div>
+
+                <div className="flex items-center gap-3 p-4 bg-orange-50 rounded-xl border border-orange-100">
+                  <CheckCircle2 className="w-5 h-5 text-orange-500" />
+                  <p className="text-xs text-orange-700 font-medium">
+                    This item will be marked as <span className="font-bold underline text-orange-800">Available</span> by default.
+                  </p>
                 </div>
               </div>
 

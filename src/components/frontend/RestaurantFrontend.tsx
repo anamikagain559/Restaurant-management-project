@@ -39,6 +39,7 @@ interface MenuItem {
   description: string;
   price: number;
   category: Category;
+  image?: string;
   available: boolean;
 }
 export function RestaurantFrontend() {
@@ -578,7 +579,18 @@ export function RestaurantFrontend() {
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
 
                   <div className="h-48 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative overflow-hidden">
-                    <UtensilsCrossed className="w-12 h-12 text-orange-200 group-hover:scale-110 transition-transform duration-500" />
+                    {item.image ? (
+                      <img
+                        src={item.image}
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
+                        }}
+                      />
+                    ) : (
+                      <UtensilsCrossed className="w-12 h-12 text-orange-200 group-hover:scale-110 transition-transform duration-500" />
+                    )}
                     {!item.available &&
                       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
                         <span className="px-4 py-1 bg-white text-slate-900 text-sm font-bold rounded-full transform -rotate-3 shadow-lg">
