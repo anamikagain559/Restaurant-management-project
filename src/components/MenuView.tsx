@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { Plus, UtensilsCrossed, Edit2, Trash2, X, Image as ImageIcon, Tag, Hash, DollarSign, AlignLeft, Type, CheckCircle2 } from 'lucide-react';
+import Swal from 'sweetalert2';
+import { Plus, UtensilsCrossed, Edit2, Trash2, X, Image as ImageIcon, Tag, DollarSign, AlignLeft, Type, CheckCircle2 } from 'lucide-react';
 import {
   useGetAllMenuQuery,
   useDeleteMenuMutation,
@@ -10,13 +11,13 @@ import {
 type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
 
 interface MenuItem {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
   category: Category;
   image?: string;
-  available: boolean;
+  isAvailable: boolean;
 }
 
 export function MenuView() {
@@ -27,13 +28,14 @@ export function MenuView() {
   const [createMenu, { isLoading: isCreating }] = useCreateMenuMutation();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [newItem, setNewItem] = useState({
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
+  const [itemFormData, setItemFormData] = useState({
     name: '',
     description: '',
     price: '',
     category: 'Main Course' as Category,
     image: '',
-    available: true
+    isAvailable: true
   });
 
   const menuItems: MenuItem[] = menuData?.data || [];
@@ -42,11 +44,33 @@ export function MenuView() {
     : menuItems.filter((item) => item.category === activeCategory);
 
   const handleDelete = async (id: string) => {
-    if (window.confirm('Are you sure you want to delete this item?')) {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: "You won't be able to revert this!",
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#f97316', // orange-500
+      cancelButtonColor: '#64748b', // slate-500
+      confirmButtonText: 'Yes, delete it!',
+      background: '#ffffff',
+    });
+
+    if (result.isConfirmed) {
       try {
         await deleteMenu(id).unwrap();
+        Swal.fire({
+          title: 'Deleted!',
+          text: 'Menu item has been deleted.',
+          icon: 'success',
+          confirmButtonColor: '#f97316'
+        });
       } catch (err: any) {
-        alert(err?.data?.message || 'Failed to delete item');
+        Swal.fire({
+          title: 'Error!',
+          text: err?.data?.message || 'Failed to delete item',
+          icon: 'error',
+          confirmButtonColor: '#f97316'
+        });
       }
     }
   };
@@ -54,32 +78,76 @@ export function MenuView() {
   const toggleAvailability = async (item: MenuItem) => {
     try {
       await updateMenu({
-        id: item.id,
-        data: { available: !item.available }
+        id: item._id, // Backend uses _id
+        data: { isAvailable: !item.isAvailable }
       }).unwrap();
     } catch (err: any) {
-      alert(err?.data?.message || 'Failed to update availability');
+      Swal.fire({
+        title: 'Error!',
+        text: err?.data?.message || 'Failed to update availability',
+        icon: 'error',
+        confirmButtonColor: '#f97316'
+      });
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleOpenEdit = (item: MenuItem) => {
+    setEditingItem(item);
+    setItemFormData({
+      name: item.name,
+      description: item.description,
+      price: item.price.toString(),
+      category: item.category,
+      image: item.image || '',
+      isAvailable: item.isAvailable
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleOpenCreate = () => {
+    setEditingItem(null);
+    setItemFormData({
+      name: '',
+      description: '',
+      price: '',
+      category: 'Main Course',
+      image: '',
+      isAvailable: true
+    });
+    setIsModalOpen(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      await createMenu({
-        ...newItem,
-        price: Number(newItem.price)
-      }).unwrap();
+      if (editingItem) {
+        await updateMenu({
+          id: editingItem._id,
+          data: {
+            ...itemFormData,
+            price: Number(itemFormData.price)
+          }
+        }).unwrap();
+      } else {
+        await createMenu({
+          ...itemFormData,
+          price: Number(itemFormData.price)
+        }).unwrap();
+      }
       setIsModalOpen(false);
-      setNewItem({
-        name: '',
-        description: '',
-        price: '',
-        category: 'Main Course',
-        image: '',
-        available: true
+      Swal.fire({
+        title: 'Success!',
+        text: editingItem ? 'Item updated successfully' : 'Item created successfully',
+        icon: 'success',
+        confirmButtonColor: '#f97316'
       });
     } catch (err: any) {
-      alert(err?.data?.message || 'Failed to create item');
+      Swal.fire({
+        title: 'Error!',
+        text: err?.data?.message || 'Failed to save item',
+        icon: 'error',
+        confirmButtonColor: '#f97316'
+      });
     }
   };
 
@@ -91,7 +159,7 @@ export function MenuView() {
           <p className="text-slate-500 text-sm">Manage your dishes and pricing</p>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={handleOpenCreate}
           className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm"
         >
           <Plus className="w-5 h-5" />
@@ -129,7 +197,7 @@ export function MenuView() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {filteredItems.map((item) => (
             <div
-              key={item.id}
+              key={item._id}
               className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden group hover:shadow-md transition-all"
             >
               <div className="h-40 bg-slate-100 flex items-center justify-center relative">
@@ -149,21 +217,21 @@ export function MenuView() {
                 {/* Actions Overlay */}
                 <div className="absolute top-3 right-3 flex flex-col gap-2">
                   <button
-                    onClick={() => console.log('Edit', item.id)}
+                    onClick={() => handleOpenEdit(item)}
                     className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-orange-500 hover:scale-110 transition-all border border-white/20"
                     title="Edit Item"
                   >
                     <Edit2 className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={() => handleDelete(item._id)}
                     className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-red-500 hover:scale-110 transition-all border border-white/20"
                     title="Delete Item"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                {!item.available && (
+                {!item.isAvailable && (
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
                     <span className="px-3 py-1 bg-slate-800 text-white text-xs font-bold rounded-full">
                       Sold Out
@@ -186,8 +254,8 @@ export function MenuView() {
                     onClick={() => toggleAvailability(item)}
                     className="flex items-center gap-2 hover:bg-slate-50 p-1 rounded transition-colors"
                   >
-                    <span className={`w-2 h-2 rounded-full ${item.available ? 'bg-green-500' : 'bg-red-500'}`} />
-                    <span className="text-xs text-slate-500">{item.available ? 'Available' : 'Unavailable'}</span>
+                    <span className={`w-2 h-2 rounded-full ${item.isAvailable ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <span className="text-xs text-slate-500">{item.isAvailable ? 'Available' : 'Unavailable'}</span>
                   </button>
                 </div>
               </div>
@@ -201,13 +269,15 @@ export function MenuView() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
           <div className="bg-white rounded-2xl shadow-xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in duration-200">
             <div className="flex items-center justify-between p-6 border-b border-slate-100">
-              <h3 className="text-xl font-bold text-slate-800">Add New Menu Item</h3>
+              <h3 className="text-xl font-bold text-slate-800">
+                {editingItem ? 'Edit Menu Item' : 'Add New Menu Item'}
+              </h3>
               <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
                 <X className="w-6 h-6" />
               </button>
             </div>
 
-            <form onSubmit={handleCreate} className="p-6 space-y-5">
+            <form onSubmit={handleSubmit} className="p-6 space-y-5">
               <div className="space-y-4">
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 mb-2">
@@ -219,8 +289,8 @@ export function MenuView() {
                     type="text"
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder:text-slate-400 bg-slate-50/50"
                     placeholder="E.g. Signature Truffle Pasta"
-                    value={newItem.name}
-                    onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                    value={itemFormData.name}
+                    onChange={(e) => setItemFormData({ ...itemFormData, name: e.target.value })}
                   />
                 </div>
 
@@ -234,8 +304,8 @@ export function MenuView() {
                     rows={2}
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all placeholder:text-slate-400 bg-slate-50/50 resize-none"
                     placeholder="Short description of the dish..."
-                    value={newItem.description}
-                    onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                    value={itemFormData.description}
+                    onChange={(e) => setItemFormData({ ...itemFormData, description: e.target.value })}
                   />
                 </div>
 
@@ -250,8 +320,8 @@ export function MenuView() {
                       type="number"
                       step="0.01"
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-slate-50/50"
-                      value={newItem.price}
-                      onChange={(e) => setNewItem({ ...newItem, price: e.target.value })}
+                      value={itemFormData.price}
+                      onChange={(e) => setItemFormData({ ...itemFormData, price: e.target.value })}
                     />
                   </div>
                   <div>
@@ -261,8 +331,8 @@ export function MenuView() {
                     </label>
                     <select
                       className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-slate-50/50 cursor-pointer font-sans"
-                      value={newItem.category}
-                      onChange={(e) => setNewItem({ ...newItem, category: e.target.value as Category })}
+                      value={itemFormData.category}
+                      onChange={(e) => setItemFormData({ ...itemFormData, category: e.target.value as Category })}
                     >
                       <option value="Appetizers">Appetizers</option>
                       <option value="Main Course">Main Course</option>
@@ -281,8 +351,8 @@ export function MenuView() {
                     type="url"
                     placeholder="Paste image link here..."
                     className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none transition-all bg-slate-50/50"
-                    value={newItem.image}
-                    onChange={(e) => setNewItem({ ...newItem, image: e.target.value })}
+                    value={itemFormData.image}
+                    onChange={(e) => setItemFormData({ ...itemFormData, image: e.target.value })}
                   />
                 </div>
 
@@ -307,7 +377,7 @@ export function MenuView() {
                   disabled={isCreating}
                   className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 font-medium disabled:opacity-50"
                 >
-                  {isCreating ? 'Adding...' : 'Add Item'}
+                  {isCreating ? 'Saving...' : (editingItem ? 'Save Changes' : 'Add Item')}
                 </button>
               </div>
             </form>

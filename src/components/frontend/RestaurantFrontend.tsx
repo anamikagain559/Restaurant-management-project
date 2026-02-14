@@ -1,4 +1,5 @@
 import React, { useEffect, useState, memo } from 'react';
+import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, useCurrentUser } from '../../redux/features/auth/authSlice';
@@ -34,13 +35,13 @@ import {
   'lucide-react';
 type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
 interface MenuItem {
-  id: string;
+  _id: string;
   name: string;
   description: string;
   price: number;
   category: Category;
   image?: string;
-  available: boolean;
+  isAvailable: boolean;
 }
 export function RestaurantFrontend() {
   const navigate = useNavigate();
@@ -93,9 +94,9 @@ export function RestaurantFrontend() {
 
   const addToCart = (item: MenuItem) => {
     setCart(prev => {
-      const existing = prev.find(i => i.item.id === item.id);
+      const existing = prev.find(i => i.item._id === item._id);
       if (existing) {
-        return prev.map(i => i.item.id === item.id ? { ...i, quantity: i.quantity + 1 } : i);
+        return prev.map(i => i.item._id === item._id ? { ...i, quantity: i.quantity + 1 } : i);
       }
       return [...prev, { item, quantity: 1 }];
     });
@@ -103,12 +104,12 @@ export function RestaurantFrontend() {
   };
 
   const removeFromCart = (id: string) => {
-    setCart(prev => prev.filter(i => i.item.id !== id));
+    setCart(prev => prev.filter(i => i.item._id !== id));
   };
 
   const updateQuantity = (id: string, delta: number) => {
     setCart(prev => prev.map(i => {
-      if (i.item.id === id) {
+      if (i.item._id === id) {
         const newQty = Math.max(1, i.quantity + delta);
         return { ...i, quantity: newQty };
       }
@@ -123,7 +124,7 @@ export function RestaurantFrontend() {
     try {
       await createOrder({
         items: cart.map(i => ({
-          menuItem: i.item.id,
+          menuItem: i.item._id,
           quantity: i.quantity,
           price: i.item.price
         })),
@@ -131,11 +132,21 @@ export function RestaurantFrontend() {
         totalAmount: cartTotal
       }).unwrap();
 
-      alert('Order placed successfully! Please visit our restaurant to enjoy your meal.');
+      Swal.fire({
+        title: 'Success!',
+        text: 'Order placed successfully! Please visit our restaurant to enjoy your meal.',
+        icon: 'success',
+        confirmButtonColor: '#f97316'
+      });
       setCart([]);
       setIsCartOpen(false);
     } catch (err: any) {
-      alert(err?.data?.message || 'Failed to place order.');
+      Swal.fire({
+        title: 'Error!',
+        text: err?.data?.message || 'Failed to place order.',
+        icon: 'error',
+        confirmButtonColor: '#f97316'
+      });
     }
   };
 
@@ -143,7 +154,12 @@ export function RestaurantFrontend() {
     e.preventDefault();
     try {
       await createReservation(reservation).unwrap();
-      alert('Reservation submitted successfully!');
+      Swal.fire({
+        title: 'Reserved!',
+        text: 'Reservation submitted successfully!',
+        icon: 'success',
+        confirmButtonColor: '#f97316'
+      });
       setReservation({
         name: '',
         email: '',
@@ -154,7 +170,12 @@ export function RestaurantFrontend() {
         requests: ''
       });
     } catch (err: any) {
-      alert(err?.data?.message || 'Failed to submit reservation.');
+      Swal.fire({
+        title: 'Error!',
+        text: err?.data?.message || 'Failed to submit reservation.',
+        icon: 'error',
+        confirmButtonColor: '#f97316'
+      });
     }
   };
 
@@ -575,7 +596,7 @@ export function RestaurantFrontend() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredItems.map((item) => (
                 <div
-                  key={item.id}
+                  key={item._id}
                   className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
 
                   <div className="h-48 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative overflow-hidden">
@@ -591,7 +612,7 @@ export function RestaurantFrontend() {
                     ) : (
                       <UtensilsCrossed className="w-12 h-12 text-orange-200 group-hover:scale-110 transition-transform duration-500" />
                     )}
-                    {!item.available &&
+                    {!item.isAvailable &&
                       <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
                         <span className="px-4 py-1 bg-white text-slate-900 text-sm font-bold rounded-full transform -rotate-3 shadow-lg">
                           Sold Out
@@ -617,7 +638,7 @@ export function RestaurantFrontend() {
                       </span>
                       <button
                         onClick={() => addToCart(item)}
-                        disabled={!item.available}
+                        disabled={!item.isAvailable}
                         className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
                         <Plus className="w-4 h-4" /> Add
                       </button>
@@ -659,24 +680,24 @@ export function RestaurantFrontend() {
                   </div>
                 ) : (
                   cart.map((i) => (
-                    <div key={i.item.id} className="flex gap-4">
+                    <div key={i.item._id} className="flex gap-4">
                       <div className="w-20 h-20 bg-slate-100 rounded-xl flex items-center justify-center">
                         <UtensilsCrossed className="w-8 h-8 text-slate-300" />
                       </div>
                       <div className="flex-1">
                         <div className="flex justify-between mb-1">
                           <h4 className="font-bold text-slate-800">{i.item.name}</h4>
-                          <button onClick={() => removeFromCart(i.item.id)} className="text-slate-400 hover:text-red-500">
+                          <button onClick={() => removeFromCart(i.item._id)} className="text-slate-400 hover:text-red-500">
                             <Trash2 className="w-4 h-4" />
                           </button>
                         </div>
                         <div className="flex justify-between items-center">
                           <div className="flex items-center gap-3 bg-slate-50 rounded-lg p-1">
-                            <button onClick={() => updateQuantity(i.item.id, -1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
+                            <button onClick={() => updateQuantity(i.item._id, -1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
                               <Minus className="w-3 h-3" />
                             </button>
                             <span className="text-sm font-bold w-4 text-center">{i.quantity}</span>
-                            <button onClick={() => updateQuantity(i.item.id, 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
+                            <button onClick={() => updateQuantity(i.item._id, 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
                               <Plus className="w-3 h-3" />
                             </button>
                           </div>
