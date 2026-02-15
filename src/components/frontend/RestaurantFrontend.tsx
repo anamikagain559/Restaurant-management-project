@@ -200,7 +200,8 @@ export function RestaurantFrontend() {
     try {
       await createReservation({
         ...reservation,
-        email: user.email
+        email: user.email,
+        guests: Number(reservation.guests)
       }).unwrap();
       Toast.fire({
         icon: 'success',
