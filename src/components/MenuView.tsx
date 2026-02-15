@@ -1,5 +1,17 @@
 import React, { useState } from 'react';
 import Swal from 'sweetalert2';
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer);
+    toast.addEventListener('mouseleave', Swal.resumeTimer);
+  }
+});
 import { Plus, UtensilsCrossed, Edit2, Trash2, X, Image as ImageIcon, Tag, DollarSign, AlignLeft, Type, CheckCircle2 } from 'lucide-react';
 import {
   useGetAllMenuQuery,
@@ -58,11 +70,9 @@ export function MenuView() {
     if (result.isConfirmed) {
       try {
         await deleteMenu(id).unwrap();
-        Swal.fire({
-          title: 'Deleted!',
-          text: 'Menu item has been deleted.',
+        Toast.fire({
           icon: 'success',
-          confirmButtonColor: '#f97316'
+          title: 'Item deleted successfully'
         });
       } catch (err: any) {
         Swal.fire({
@@ -81,6 +91,10 @@ export function MenuView() {
         id: item._id, // Backend uses _id
         data: { isAvailable: !item.isAvailable }
       }).unwrap();
+      Toast.fire({
+        icon: 'success',
+        title: `Item is now ${!item.isAvailable ? 'available' : 'unavailable'}`
+      });
     } catch (err: any) {
       Swal.fire({
         title: 'Error!',
@@ -135,11 +149,9 @@ export function MenuView() {
         }).unwrap();
       }
       setIsModalOpen(false);
-      Swal.fire({
-        title: 'Success!',
-        text: editingItem ? 'Item updated successfully' : 'Item created successfully',
+      Toast.fire({
         icon: 'success',
-        confirmButtonColor: '#f97316'
+        title: editingItem ? 'Item updated successfully' : 'Item created successfully'
       });
     } catch (err: any) {
       Swal.fire({

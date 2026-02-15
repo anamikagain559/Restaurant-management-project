@@ -1,5 +1,17 @@
 import React, { useEffect, useState, memo } from 'react';
 import Swal from 'sweetalert2';
+
+const Toast = Swal.mixin({
+  toast: true,
+  position: 'top-end',
+  showConfirmButton: false,
+  timer: 3000,
+  timerProgressBar: true,
+  didOpen: (toast) => {
+    toast.addEventListener('mouseenter', Swal.stopTimer);
+    toast.addEventListener('mouseleave', Swal.resumeTimer);
+  }
+});
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout, useCurrentUser } from '../../redux/features/auth/authSlice';
@@ -121,8 +133,26 @@ export function RestaurantFrontend() {
 
   const handlePlaceOrder = async () => {
     if (cart.length === 0) return;
+
+    if (!user) {
+      Swal.fire({
+        title: 'Login Required',
+        text: 'Please login to place an order.',
+        icon: 'info',
+        confirmButtonColor: '#f97316',
+        showCancelButton: true,
+        confirmButtonText: 'Go to Login'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login');
+        }
+      });
+      return;
+    }
+
     try {
       await createOrder({
+        email: user.email,
         items: cart.map(i => ({
           menuItem: i.item._id,
           quantity: i.quantity,
@@ -132,11 +162,9 @@ export function RestaurantFrontend() {
         totalAmount: cartTotal
       }).unwrap();
 
-      Swal.fire({
-        title: 'Success!',
-        text: 'Order placed successfully! Please visit our restaurant to enjoy your meal.',
+      Toast.fire({
         icon: 'success',
-        confirmButtonColor: '#f97316'
+        title: 'Order placed successfully!'
       });
       setCart([]);
       setIsCartOpen(false);
@@ -152,13 +180,31 @@ export function RestaurantFrontend() {
 
   const handleReservationSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await createReservation(reservation).unwrap();
+
+    if (!user) {
       Swal.fire({
-        title: 'Reserved!',
-        text: 'Reservation submitted successfully!',
+        title: 'Login Required',
+        text: 'Please login to make a reservation.',
+        icon: 'info',
+        confirmButtonColor: '#f97316',
+        showCancelButton: true,
+        confirmButtonText: 'Go to Login'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          navigate('/login');
+        }
+      });
+      return;
+    }
+
+    try {
+      await createReservation({
+        ...reservation,
+        email: user.email
+      }).unwrap();
+      Toast.fire({
         icon: 'success',
-        confirmButtonColor: '#f97316'
+        title: 'Reservation submitted successfully!'
       });
       setReservation({
         name: '',
