@@ -144,7 +144,7 @@ export function RestaurantFrontend() {
         confirmButtonText: 'Go to Login'
       }).then((result) => {
         if (result.isConfirmed) {
-          navigate('/login');
+          navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
         }
       });
       return;
@@ -191,7 +191,7 @@ export function RestaurantFrontend() {
         confirmButtonText: 'Go to Login'
       }).then((result) => {
         if (result.isConfirmed) {
-          navigate('/login');
+          navigate(`/login?redirect=${encodeURIComponent(window.location.pathname)}`);
         }
       });
       return;

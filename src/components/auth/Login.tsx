@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { ChefHat, Mail, Lock, ArrowRight, Loader2 } from 'lucide-react';
 import { useLoginMutation } from '../../redux/features/auth/authApi';
 import { setUser } from '../../redux/features/auth/authSlice';
@@ -7,6 +7,7 @@ import { useDispatch } from 'react-redux';
 
 export const Login = () => {
     const navigate = useNavigate();
+    const location = useLocation();
     const dispatch = useDispatch();
     const [login, { isLoading }] = useLoginMutation();
     const [formData, setFormData] = useState({
@@ -33,16 +34,23 @@ export const Login = () => {
                     token: res.data.accessToken
                 }));
 
-                const role = res.data.user.role?.toLowerCase();
-                if (role === 'admin') {
-                    console.log('Navigating to admin dashboard');
-                    navigate('/admin/dashboard');
-                } else if (role === 'user') {
-                    console.log('Navigating to user dashboard');
-                    navigate('/user/dashboard');
+                // Check if there's a redirect URL from where user came from
+                const searchParams = new URLSearchParams(location.search);
+                const redirectTo = searchParams.get('redirect');
+
+                if (redirectTo) {
+                    // Redirect back to the original page
+                    navigate(redirectTo);
                 } else {
-                    console.log('Unknown role:', res.data.user.role);
-                    navigate('/');
+                    // Default role-based navigation
+                    const role = res.data.user.role?.toLowerCase();
+                    if (role === 'admin') {
+                        navigate('/admin/dashboard');
+                    } else if (role === 'user') {
+                        navigate('/user/dashboard');
+                    } else {
+                        navigate('/');
+                    }
                 }
             }
         } catch (err: any) {

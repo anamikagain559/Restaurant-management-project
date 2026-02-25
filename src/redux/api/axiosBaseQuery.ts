@@ -24,7 +24,10 @@ export const axiosBaseQuery =
                     method,
                     data,
                     params,
-                    headers,
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...headers,
+                    },
                 })
                 return { data: result.data }
             } catch (axiosError) {

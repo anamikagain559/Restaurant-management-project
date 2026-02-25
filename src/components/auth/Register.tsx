@@ -1,11 +1,16 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ChefHat, Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
-import { useRegisterMutation } from '../../redux/features/auth/authApi';
+import { useRegisterMutation, useLoginMutation } from '../../redux/features/auth/authApi';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../../redux/features/auth/authSlice';
+import Swal from 'sweetalert2';
 
 export const Register = () => {
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [register, { isLoading }] = useRegisterMutation();
+    const [login] = useLoginMutation();
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -24,14 +29,54 @@ export const Register = () => {
         }
 
         try {
-            const res = await register(formData).unwrap();
+            const { confirmPassword, ...registerData } = formData;
+            const res = await register(registerData).unwrap();
 
-            // Assuming simplified register or auto-login. For now just redirect to login.
             if (res.success) {
-                navigate('/login');
+                // Show success notification
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Registration Successful!',
+                    text: 'Welcome to our restaurant management system.',
+                    confirmButtonColor: '#f97316',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
+
+                // Auto-login after registration
+                try {
+                    const loginRes = await login({
+                        email: registerData.email,
+                        password: registerData.password
+                    }).unwrap();
+
+                    if (loginRes.success && loginRes.data) {
+                        dispatch(setUser({
+                            user: loginRes.data.user,
+                            token: loginRes.data.accessToken
+                        }));
+
+                        // Navigate based on role
+                        const role = loginRes.data.user.role?.toLowerCase();
+                        if (role === 'admin') {
+                            navigate('/admin/dashboard');
+                        } else {
+                            navigate('/user/dashboard');
+                        }
+                    }
+                } catch (loginErr) {
+                    // If auto-login fails, redirect to login page
+                    navigate('/login');
+                }
             }
         } catch (err: any) {
             console.error('Registration failed:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Registration Failed',
+                text: err?.data?.message || 'Registration failed. Please try again.',
+                confirmButtonColor: '#f97316'
+            });
             setError(err?.data?.message || 'Registration failed.');
         }
     };
