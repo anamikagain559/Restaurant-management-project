@@ -1,5 +1,5 @@
 import { useSelector, useDispatch } from 'react-redux';
-import { useCurrentUser, logout } from '../redux/features/auth/authSlice';
+import { useCurrentUser, logout } from '../../../redux/features/auth/authSlice';
 import { useNavigate } from 'react-router-dom';
 import {
     User,
@@ -13,7 +13,7 @@ import {
     Bell
 } from 'lucide-react';
 
-export function UserDashboard() {
+export function UserHome() {
     const user = useSelector(useCurrentUser);
     const dispatch = useDispatch();
     const navigate = useNavigate();

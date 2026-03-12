@@ -6,7 +6,7 @@ import {
   useCreateTableMutation,
   useUpdateTableMutation,
   useDeleteTableMutation
-} from '../redux/features/table/tableApi';
+} from '../../../redux/features/table/tableApi';
 
 const Toast = Swal.mixin({
   toast: true,

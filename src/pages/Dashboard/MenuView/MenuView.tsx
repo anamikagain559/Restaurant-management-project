@@ -18,7 +18,7 @@ import {
   useDeleteMenuMutation,
   useUpdateMenuMutation,
   useCreateMenuMutation
-} from '../redux/features/menu/menuApi';
+} from '../../../redux/features/menu/menuApi';
 
 type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
 
@@ -32,7 +32,12 @@ interface MenuItem {
   isAvailable: boolean;
 }
 
+import { useSelector } from 'react-redux';
+import { useCurrentUser } from '../../../redux/features/auth/authSlice';
+
 export function MenuView() {
+  const user = useSelector(useCurrentUser);
+  const isAdmin = user?.role === 'admin';
   const [activeCategory, setActiveCategory] = useState<Category>('All');
   const { data: menuData, isLoading } = useGetAllMenuQuery(undefined);
   const [deleteMenu] = useDeleteMenuMutation();
@@ -56,6 +61,7 @@ export function MenuView() {
     : menuItems.filter((item) => item.category === activeCategory);
 
   const handleDelete = async (id: string) => {
+    if (!isAdmin) return;
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: "You won't be able to revert this!",
@@ -86,6 +92,7 @@ export function MenuView() {
   };
 
   const toggleAvailability = async (item: MenuItem) => {
+    if (!isAdmin) return;
     try {
       await updateMenu({
         id: item._id, // Backend uses _id
@@ -106,6 +113,7 @@ export function MenuView() {
   };
 
   const handleOpenEdit = (item: MenuItem) => {
+    if (!isAdmin) return;
     setEditingItem(item);
     setItemFormData({
       name: item.name,
@@ -119,6 +127,7 @@ export function MenuView() {
   };
 
   const handleOpenCreate = () => {
+    if (!isAdmin) return;
     setEditingItem(null);
     setItemFormData({
       name: '',
@@ -133,6 +142,7 @@ export function MenuView() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isAdmin) return;
     try {
       if (editingItem) {
         await updateMenu({
@@ -167,16 +177,22 @@ export function MenuView() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-2xl font-bold text-slate-800">Menu Management</h2>
-          <p className="text-slate-500 text-sm">Manage your dishes and pricing</p>
+          <h2 className="text-2xl font-bold text-slate-800">
+            {isAdmin ? 'Menu Management' : 'Our Menu'}
+          </h2>
+          <p className="text-slate-500 text-sm">
+            {isAdmin ? 'Manage your dishes and pricing' : 'Browse our delicious offerings'}
+          </p>
         </div>
-        <button
-          onClick={handleOpenCreate}
-          className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm"
-        >
-          <Plus className="w-5 h-5" />
-          <span>Add New Item</span>
-        </button>
+        {isAdmin && (
+          <button
+            onClick={handleOpenCreate}
+            className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600 transition-colors shadow-sm"
+          >
+            <Plus className="w-5 h-5" />
+            <span>Add New Item</span>
+          </button>
+        )}
       </div>
 
       {/* Categories */}
@@ -227,22 +243,24 @@ export function MenuView() {
                 )}
 
                 {/* Actions Overlay */}
-                <div className="absolute top-3 right-3 flex flex-col gap-2">
-                  <button
-                    onClick={() => handleOpenEdit(item)}
-                    className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-orange-500 hover:scale-110 transition-all border border-white/20"
-                    title="Edit Item"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item._id)}
-                    className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-red-500 hover:scale-110 transition-all border border-white/20"
-                    title="Delete Item"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
+                {isAdmin && (
+                  <div className="absolute top-3 right-3 flex flex-col gap-2">
+                    <button
+                      onClick={() => handleOpenEdit(item)}
+                      className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-orange-500 hover:scale-110 transition-all border border-white/20"
+                      title="Edit Item"
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={() => handleDelete(item._id)}
+                      className="p-2.5 bg-white/90 backdrop-blur-md rounded-xl shadow-lg text-slate-700 hover:text-red-500 hover:scale-110 transition-all border border-white/20"
+                      title="Delete Item"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                )}
                 {!item.isAvailable && (
                   <div className="absolute inset-0 bg-white/60 backdrop-blur-[1px] flex items-center justify-center">
                     <span className="px-3 py-1 bg-slate-800 text-white text-xs font-bold rounded-full">
@@ -262,13 +280,20 @@ export function MenuView() {
                   <span className="text-xs font-medium px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600">
                     {item.category}
                   </span>
-                  <button
-                    onClick={() => toggleAvailability(item)}
-                    className="flex items-center gap-2 hover:bg-slate-50 p-1 rounded transition-colors"
-                  >
-                    <span className={`w-2 h-2 rounded-full ${item.isAvailable ? 'bg-green-500' : 'bg-red-500'}`} />
-                    <span className="text-xs text-slate-500">{item.isAvailable ? 'Available' : 'Unavailable'}</span>
-                  </button>
+                  {isAdmin ? (
+                    <button
+                      onClick={() => toggleAvailability(item)}
+                      className="flex items-center gap-2 hover:bg-slate-50 p-1 rounded transition-colors"
+                    >
+                      <span className={`w-2 h-2 rounded-full ${item.isAvailable ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <span className="text-xs text-slate-500">{item.isAvailable ? 'Available' : 'Unavailable'}</span>
+                    </button>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <span className={`w-2 h-2 rounded-full ${item.isAvailable ? 'bg-green-500' : 'bg-red-500'}`} />
+                      <span className="text-xs text-slate-500">{item.isAvailable ? 'Available' : 'Unavailable'}</span>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

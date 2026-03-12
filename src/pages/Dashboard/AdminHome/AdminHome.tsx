@@ -7,7 +7,7 @@ import {
   TrendingUp,
   Clock } from
 'lucide-react';
-export function Dashboard() {
+export function AdminHome() {
   const stats = [
   {
     label: "Today's Revenue",

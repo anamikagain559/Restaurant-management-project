@@ -59,9 +59,9 @@ export const Register = () => {
                         // Navigate based on role
                         const role = loginRes.data.user.role?.toLowerCase();
                         if (role === 'admin') {
-                            navigate('/admin/dashboard');
+                            navigate('/dashboard/admin');
                         } else {
-                            navigate('/user/dashboard');
+                            navigate('/dashboard/user');
                         }
                     }
                 } catch (loginErr) {

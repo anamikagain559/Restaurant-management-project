@@ -45,9 +45,9 @@ export const Login = () => {
                     // Default role-based navigation
                     const role = res.data.user.role?.toLowerCase();
                     if (role === 'admin') {
-                        navigate('/admin/dashboard');
+                        navigate('/dashboard/admin');
                     } else if (role === 'user') {
-                        navigate('/user/dashboard');
+                        navigate('/dashboard/user');
                     } else {
                         navigate('/');
                     }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, memo } from 'react';
+import { useEffect, useState } from 'react';
 import Swal from 'sweetalert2';
 
 const Toast = Swal.mixin({
@@ -18,8 +18,8 @@ import { logout, useCurrentUser } from '../../redux/features/auth/authSlice';
 import { useGetAllMenuQuery } from '../../redux/features/menu/menuApi';
 import { useCreateReservationMutation } from '../../redux/features/reservation/reservationApi';
 import { useCreateOrderMutation } from '../../redux/features/order/orderApi';
-import ThreeScene from "../ThreeScene/ThreeScene";
-import AnimatedBackground from "../AnimatedBackground";
+import ThreeScene from "../../components/ThreeScene/ThreeScene";
+import AnimatedBackground from "../../components/AnimatedBackground";
 
 import {
   UtensilsCrossed,
@@ -68,7 +68,7 @@ export function RestaurantFrontend() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuCategories: Category[] = ['All', 'Appetizers', 'Main Course', 'Desserts', 'Beverages'];
   const [activeCategory, setActiveCategory] = useState<typeof menuCategories[number]>('All');
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
   const [cart, setCart] = useState<{ item: MenuItem, quantity: number }[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   // Reservation Form State

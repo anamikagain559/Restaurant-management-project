@@ -1,7 +1,6 @@
-import React from 'react';
-import { useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { logout } from '../redux/features/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate, NavLink } from 'react-router-dom';
+import { logout, useCurrentUser } from '../redux/features/auth/authSlice';
 import {
   LayoutDashboard,
   ClipboardList,
@@ -10,51 +9,64 @@ import {
   CalendarDays,
   LogOut,
   ChefHat
-} from
-  'lucide-react';
-type View = 'dashboard' | 'orders' | 'menu' | 'tables' | 'reservations';
+} from 'lucide-react';
+
 interface SidebarProps {
-  activeView: View;
-  onNavigate: (view: View) => void;
   isMobileOpen: boolean;
   setIsMobileOpen: (isOpen: boolean) => void;
 }
+
 export function Sidebar({
-  activeView,
-  onNavigate,
   isMobileOpen,
   setIsMobileOpen
 }: SidebarProps) {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = useSelector(useCurrentUser);
+
+  const rolePath = user?.role === 'admin' ? '/dashboard/admin' : '/dashboard/user';
 
   const navItems = [
     {
       id: 'dashboard',
+      path: rolePath,
       label: 'Dashboard',
       icon: LayoutDashboard
     },
     {
       id: 'orders',
-      label: 'Orders',
+      path: '/dashboard/orders',
+      label: user?.role === 'admin' ? 'Order Management' : 'My Orders',
       icon: ClipboardList
     },
     {
       id: 'menu',
-      label: 'Menu',
+      path: '/dashboard/menu',
+      label: user?.role === 'admin' ? 'Menu Management' : 'Our Menu',
       icon: UtensilsCrossed
     },
     {
       id: 'tables',
+      path: '/dashboard/tables',
       label: 'Tables',
-      icon: Grid3x3
+      icon: Grid3x3,
+      adminOnly: true
     },
     {
       id: 'reservations',
-      label: 'Reservations',
+      path: '/dashboard/reservations',
+      label: user?.role === 'admin' ? 'Reservations' : 'My Reservations',
       icon: CalendarDays
-    }] as
-    const;
+    }
+  ];
+
+  const filteredNavItems = navItems.filter(item => {
+    if ('adminOnly' in item && item.adminOnly && user?.role !== 'admin') {
+      return false;
+    }
+    return true;
+  });
+
   const sidebarClasses = `
     fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-200 ease-in-out
     ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
@@ -69,12 +81,12 @@ export function Sidebar({
   return (
     <>
       {/* Mobile Overlay */}
-      {isMobileOpen &&
+      {isMobileOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 md:hidden"
-          onClick={() => setIsMobileOpen(false)} />
-
-      }
+          onClick={() => setIsMobileOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside className={sidebarClasses}>
@@ -86,31 +98,28 @@ export function Sidebar({
             </div>
             <div>
               <h1 className="text-xl font-bold text-white">RestoManager</h1>
-              <p className="text-xs text-slate-400">Admin Portal</p>
+              <p className="text-xs text-slate-400">{user?.role === 'admin' ? 'Admin Portal' : 'User Portal'}</p>
             </div>
           </div>
 
           {/* Navigation */}
           <nav className="flex-1 px-4 py-6 space-y-2">
-            {navItems.map((item) => {
+            {filteredNavItems.map((item) => {
               const Icon = item.icon;
-              const isActive = activeView === item.id;
               return (
-                <button
+                <NavLink
                   key={item.id}
-                  onClick={() => {
-                    onNavigate(item.id);
-                    setIsMobileOpen(false);
-                  }}
-                  className={`
+                  to={item.path}
+                  onClick={() => setIsMobileOpen(false)}
+                  className={({ isActive }) => `
                     w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
                     ${isActive ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}
-                  `}>
-
+                  `}
+                >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
-                </button>);
-
+                </NavLink>
+              );
             })}
           </nav>
 
@@ -118,13 +127,14 @@ export function Sidebar({
           <div className="p-4 border-t border-slate-800">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors">
+              className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+            >
               <LogOut className="w-5 h-5" />
               <span className="font-medium">Sign Out</span>
             </button>
           </div>
         </div>
       </aside>
-    </>);
-
+    </>
+  );
 }
