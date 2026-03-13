@@ -33,7 +33,8 @@
 
     --ring: 215 20.2% 65.1%;
 
-    --radius: 0.5rem;
+    --radius: 1.5rem;
+    --background: 355 100% 99%;
   }
 
   :root[class~="dark"] {
@@ -77,5 +78,60 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@layer utilities {
+  .bg-mesh {
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(355, 100%, 95%, 1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(180, 100%, 95%, 1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(355, 100%, 95%, 1) 0, transparent 50%),
+      radial-gradient(at 50% 50%, hsla(0, 0%, 100%, 1) 0, transparent 50%),
+      radial-gradient(at 0% 100%, hsla(180, 100%, 90%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(355, 100%, 90%, 1) 0, transparent 50%);
+  }
+
+  .bg-mesh-dark {
+    background-image: 
+      radial-gradient(at 0% 0%, hsla(355, 40%, 10%, 1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(180, 40%, 10%, 1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(355, 40%, 10% , 1) 0, transparent 50%);
+  }
+
+  .glass-panel {
+    @apply bg-white/40 backdrop-blur-xl border border-white/40 shadow-2xl;
+  }
+
+  .glass-card {
+    @apply bg-white/20 backdrop-blur-lg border border-white/20 shadow-xl;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  .text-glow-maroon {
+    text-shadow: 0 0 15px rgba(100, 20, 40, 0.2);
+  }
+
+  .animate-float {
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2.5s infinite;
+  }
+
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
   }
 }

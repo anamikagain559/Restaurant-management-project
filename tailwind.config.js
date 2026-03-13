@@ -46,6 +46,12 @@ module.exports = {content: [
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
         },
+        kona: {
+          pink: "#FCD5D9",
+          teal: "#00A18E",
+          maroon: "#8E3E4B",
+          light: "#FFF5F6",
+        }
       },
       borderRadius: {
         lg: "var(--radius)",

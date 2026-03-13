@@ -18,9 +18,6 @@ import { logout, useCurrentUser } from '../../redux/features/auth/authSlice';
 import { useGetAllMenuQuery } from '../../redux/features/menu/menuApi';
 import { useCreateReservationMutation } from '../../redux/features/reservation/reservationApi';
 import { useCreateOrderMutation } from '../../redux/features/order/orderApi';
-import ThreeScene from "../../components/ThreeScene/ThreeScene";
-import AnimatedBackground from "../../components/AnimatedBackground";
-
 import {
   UtensilsCrossed,
   ChefHat,
@@ -38,15 +35,20 @@ import {
   Users,
   Leaf,
   Wine,
+  LayoutDashboard,
   LogOut,
   ShoppingBasket,
   Plus,
   Minus,
   Trash2,
   User,
+  Mail,
   ArrowLeft
 } from
   'lucide-react';
+
+import logo from '../../assets/logo.png';
+import heroBg from '../../assets/hero-bg.png';
 type Category = 'All' | 'Appetizers' | 'Main Course' | 'Desserts' | 'Beverages';
 interface MenuItem {
   _id: string;
@@ -57,6 +59,7 @@ interface MenuItem {
   image?: string;
   isAvailable: boolean;
 }
+
 export function RestaurantFrontend() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -195,7 +198,7 @@ export function RestaurantFrontend() {
 
       Swal.fire({
         title: 'Order Placed!',
-        text: 'Thank you for choosing La Maison. Your delicious meal is on its way!',
+        text: 'Thank you for choosing Sunflower. Your delicious meal is on its way!',
         icon: 'success',
         confirmButtonColor: '#f97316'
       });
@@ -204,11 +207,34 @@ export function RestaurantFrontend() {
       setCheckoutStep('CART');
       setAddressData(prev => ({ ...prev, phone: '', deliveryAddress: '' }));
     } catch (err: any) {
+      const getFriendlyMessage = (errorObj: any) => {
+        const data = errorObj?.data;
+        const formatError = (e: any) => {
+          const field = e.path?.[e.path.length - 1] || '';
+          if (field === 'phone') return 'Mobile number must be 11 digits (e.g., 01XXXXXXXXX).';
+          if (field === 'address' || field === 'deliveryAddress') return 'Please provide a valid delivery address.';
+          return e.message?.replace(/Invalid string: must match pattern .*/, 'is not in the correct format.');
+        };
+
+        if (Array.isArray(data)) return data.map(formatError).join('\n');
+        if (typeof data === 'string') {
+          try {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) return parsed.map(formatError).join('\n');
+          } catch { return data; }
+        }
+        return errorObj?.data?.message || errorObj?.message || 'Failed to place order. Please try again.';
+      };
+
       Swal.fire({
-        title: 'Error!',
-        text: err?.data?.message || 'Failed to place order.',
-        icon: 'error',
-        confirmButtonColor: '#f97316'
+        title: 'Order Information',
+        text: getFriendlyMessage(err),
+        icon: 'info',
+        confirmButtonColor: '#f97316',
+        customClass: {
+          popup: 'rounded-[2rem]',
+          confirmButton: 'rounded-xl px-8 py-3 font-bold'
+        }
       });
     }
   };
@@ -252,11 +278,35 @@ export function RestaurantFrontend() {
         requests: ''
       });
     } catch (err: any) {
+      const getFriendlyMessage = (errorObj: any) => {
+        const data = errorObj?.data;
+        const formatError = (e: any) => {
+          const field = e.path?.[e.path.length - 1] || '';
+          if (field === 'phone') return 'Contact number must be 11 digits (e.g., 01XXXXXXXXX).';
+          if (field === 'date') return 'Please select a valid date for your visit.';
+          if (field === 'time') return 'Please select a preferred dining time.';
+          return e.message?.replace(/Invalid string: must match pattern .*/, 'is not in the correct format.');
+        };
+
+        if (Array.isArray(data)) return data.map(formatError).join('\n');
+        if (typeof data === 'string') {
+          try {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) return parsed.map(formatError).join('\n');
+          } catch { return data; }
+        }
+        return errorObj?.data?.message || errorObj?.message || 'Failed to submit reservation. Please try again.';
+      };
+
       Swal.fire({
-        title: 'Error!',
-        text: err?.data?.message || 'Failed to submit reservation.',
-        icon: 'error',
-        confirmButtonColor: '#f97316'
+        title: 'Reservation Status',
+        text: getFriendlyMessage(err),
+        icon: 'info',
+        confirmButtonColor: '#f97316',
+        customClass: {
+          popup: 'rounded-[2rem]',
+          confirmButton: 'rounded-xl px-8 py-3 font-bold'
+        }
       });
     }
   };
@@ -272,29 +322,33 @@ export function RestaurantFrontend() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
       {/* Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${isScrolled ? 'bg-white shadow-md py-3' : 'bg-transparent py-5'}`}>
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'glass-panel py-3 m-4 rounded-3xl' : 'bg-transparent py-6'}`}>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="bg-orange-500 p-2 rounded-lg">
-              <ChefHat className="w-6 h-6 text-white" />
+        <div className="max-w-7xl mx-auto px-6 sm:px-8 flex justify-between items-center text-glow">
+          <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigate('/')}>
+            <div className="relative w-14 h-14 animate-float">
+              <img
+                src={logo}
+                alt="Sunflower Logo"
+                className="w-full h-full object-cover rounded-full border-2 border-white/50 shadow-[0_0_30px_rgba(255,255,255,0.3)] group-hover:rotate-12 transition-transform duration-700"
+              />
+              <div className="absolute inset-0 rounded-full bg-white/10 animate-pulse"></div>
             </div>
             <span
-              className={`text-2xl font-bold ${isScrolled ? 'text-slate-900' : 'text-white'}`}>
-
-              La Maison
+              className="text-3xl font-black tracking-tighter text-white drop-shadow-lg">
+              SUNFLOWER
             </span>
           </div>
 
           {/* Desktop Nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className="hidden md:flex items-center gap-10">
             {navItems.map(
               (item) =>
                 item === 'Menu' ? (
                   <button
                     key={item}
                     onClick={() => navigate('/menu')}
-                    className={`text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}
+                    className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all hover:scale-110"
                   >
                     {item}
                   </button>
@@ -302,61 +356,61 @@ export function RestaurantFrontend() {
                   <button
                     key={item}
                     onClick={() => scrollToSection(item.toLowerCase())}
-                    className={`text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
-
+                    className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all hover:scale-110">
                     {item}
                   </button>
                 )
             )}
 
             {user ? (
-              <>
+              <div className="flex items-center gap-4 border-l border-white/20 pl-4">
                 <button
                   onClick={() => navigate('/dashboard')}
-                  className={`flex items-center gap-2 text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
-                  <User className="w-4 h-4" />
-                  Profile
+                  className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-white/90 hover:text-white transition-all">
+                  <LayoutDashboard className="w-4 h-4" />
+                  Portal
                 </button>
                 <button
                   onClick={handleLogout}
-                  className={`flex items-center gap-2 text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
+                  className="w-10 h-10 rounded-full glass-card flex items-center justify-center text-white hover:bg-white hover:text-kona-maroon transition-all">
                   <LogOut className="w-4 h-4" />
-                  Logout
                 </button>
-              </>
+              </div>
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className={`text-sm font-medium hover:text-orange-500 transition-colors ${isScrolled ? 'text-slate-600' : 'text-slate-200'}`}>
+                className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all">
                 Login
               </button>
             )}
 
             <button
               onClick={() => setIsCartOpen(true)}
-              className="bg-white px-4 py-2 rounded-full flex items-center gap-3 shadow-md hover:shadow-lg transition-all relative group"
+              className="glass-card px-5 py-2.5 rounded-full flex items-center gap-4 hover:bg-white/30 transition-all relative group"
             >
-                <ShoppingBasket className="w-5 h-5 text-teal-600" />
-              <span className="text-slate-700 font-bold text-sm">
-                {cartTotal.toFixed(2)} <span className="text-[10px] text-slate-400 ml-0.5">TK</span>
+              <div className="relative">
+                <ShoppingBasket className="w-5 h-5 text-white" />
+                {cart.length > 0 && (
+                  <span className="absolute -top-3 -right-3 bg-white text-kona-maroon text-[9px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-kona-teal shadow-xl">
+                    {cart.reduce((s, i) => s + i.quantity, 0)}
+                  </span>
+                )}
+              </div>
+              <span className="text-white font-black text-xs tracking-wider">
+                {cartTotal.toFixed(2)} <span className="opacity-60">TK</span>
               </span>
-              {cart.length > 0 && (
-                <span className="absolute -top-2 -right-1 bg-rose-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow-sm">
-                  {cart.reduce((s, i) => s + i.quantity, 0)}
-                </span>
-              )}
             </button>
 
             <button
               onClick={() => scrollToSection('reservations')}
-              className="bg-orange-500 hover:bg-orange-600 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-lg shadow-orange-500/20">
-              Reserve a Table
+              className="bg-white text-kona-maroon hover:bg-kona-pink hover:text-white px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95">
+              Secure Table
             </button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - Styled for AI */}
           <button
-            className="md:hidden text-orange-500"
+            className="md:hidden w-12 h-12 glass-card flex items-center justify-center text-white"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
 
             {isMobileMenuOpen ?
@@ -395,8 +449,8 @@ export function RestaurantFrontend() {
                 <button
                   onClick={() => { navigate('/dashboard'); setIsMobileMenuOpen(false); }}
                   className="text-left text-slate-600 font-medium py-2 hover:text-orange-500 flex items-center gap-2">
-                  <User className="w-4 h-4" />
-                  Profile
+                  <LayoutDashboard className="w-4 h-4" />
+                  Dashboard
                 </button>
                 <button
                   onClick={handleLogout}
@@ -421,7 +475,7 @@ export function RestaurantFrontend() {
               className="bg-slate-50 border border-slate-100 px-4 py-3 rounded-xl flex items-center justify-between group"
             >
               <div className="flex items-center gap-3">
-                  <ShoppingBasket className="w-5 h-5 text-teal-600" />
+                <ShoppingBasket className="w-5 h-5 text-teal-600" />
                 <span className="text-slate-700 font-bold text-sm">
                   Cart Total
                 </span>
@@ -448,127 +502,91 @@ export function RestaurantFrontend() {
         }
       </nav>
 
-      {/* Hero Section */}
+      {/* Hero Section - AI Ultra Premium Redesign */}
       <section
         id="home"
-        className="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-900">
-        <ThreeScene />
-        {/* Animated Background Layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-800 to-orange-950 z-0"></div>
-        <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80')] bg-cover bg-center opacity-30 z-0"></div>
+        className="relative min-h-[110vh] flex items-center justify-center overflow-hidden bg-slate-950">
 
-        {/* Decorative Gradient Orbs */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-orange-500/20 rounded-full blur-3xl animate-pulse z-0"></div>
-        <div
-          className="absolute bottom-40 right-10 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl animate-pulse z-0"
-          style={{
-            animationDelay: '1s'
-          }}>
-        </div>
-        <div
-          className="absolute top-1/2 left-1/3 w-64 h-64 bg-orange-600/10 rounded-full blur-3xl animate-pulse z-0"
-          style={{
-            animationDelay: '2s'
-          }}>
-        </div>
+        {/* Advanced AI Mesh Background */}
+        <div className="absolute inset-0 bg-mesh opacity-40 z-0"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/50 to-slate-950 z-0"></div>
 
-        {/* Decorative Grid Pattern */}
-        <div
-          className="absolute inset-0 opacity-5 z-0"
-          style={{
-            backgroundImage:
-              'radial-gradient(circle at 1px 1px, white 1px, transparent 0)',
-            backgroundSize: '40px 40px'
-          }}>
-        </div>
+        {/* Animated Particle Field (Visualized as Orbs) */}
+        {[...Array(6)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full blur-[100px] animate-pulse z-0"
+            style={{
+              width: `${Math.random() * 400 + 200}px`,
+              height: `${Math.random() * 400 + 200}px`,
+              top: `${Math.random() * 100}%`,
+              left: `${Math.random() * 100}%`,
+              backgroundColor: i % 2 === 0 ? 'rgba(180, 255, 255, 0.1)' : 'rgba(255, 180, 200, 0.1)',
+              animationDuration: `${Math.random() * 4 + 3}s`,
+              animationDelay: `${Math.random() * 5}s`
+            }}
+          />
+        ))}
 
-        {/* Decorative Lines */}
-        <div className="absolute top-0 left-1/4 w-px h-40 bg-gradient-to-b from-transparent via-orange-500/50 to-transparent z-10"></div>
-        <div className="absolute top-20 right-1/3 w-px h-32 bg-gradient-to-b from-transparent via-amber-500/40 to-transparent z-10"></div>
-        <div className="absolute bottom-40 left-1/3 w-24 h-px bg-gradient-to-r from-transparent via-orange-500/50 to-transparent z-10"></div>
+        {/* Floating AI Sunflower Centerpiece */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full flex items-center justify-center pointer-events-none z-0">
+          <div className="relative w-full h-full animate-float">
+            <img
+              src={logo}
+              alt="AI Sunflower Art"
+              className="w-full h-full object-contain opacity-40 mix-blend-screen mask-gradient"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent"></div>
+          </div>
+        </div>
 
         {/* Main Content */}
-        <div className="relative z-20 text-center px-4 max-w-5xl mx-auto">
-          {/* Decorative Top Element */}
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <div className="w-12 h-px bg-gradient-to-r from-transparent to-orange-500"></div>
-            <div className="w-2 h-2 rounded-full bg-orange-500 animate-pulse"></div>
-            <div className="w-12 h-px bg-gradient-to-l from-transparent to-orange-500"></div>
+        <div className="relative z-20 text-center px-4 max-w-6xl mx-auto pt-20">
+          {/* Futuristic Label */}
+          <div className="inline-flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-2xl text-white/60 text-[10px] font-black uppercase tracking-[0.5em] mb-12 animate-shimmer overflow-hidden">
+            <span className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-kona-teal animate-pulse"></span>
+              Redefining Organic Luxury
+            </span>
+            <span className="w-px h-3 bg-white/20"></span>
+            <span>Est. 2024</span>
           </div>
 
-          {/* Premium Badge */}
-          <div className="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-gradient-to-r from-orange-500/20 to-amber-500/20 text-orange-400 text-sm font-medium mb-8 border border-orange-500/30 backdrop-blur-sm shadow-lg shadow-orange-500/10">
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-orange-400" />
-              <Star className="w-4 h-4 fill-orange-400" />
-              <Star className="w-4 h-4 fill-orange-400" />
-            </div>
-            <span className="w-px h-4 bg-orange-500/30"></span>
-            <span className="tracking-wider uppercase text-xs font-bold">
-              Michelin Star Experience
-            </span>
-          </div>
-
-          {/* Main Heading with Glow Effect */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-white mb-6 leading-tight tracking-tight">
-            <span className="block text-slate-300 text-2xl sm:text-3xl md:text-4xl font-light tracking-widest uppercase mb-4">
-              Welcome to
-            </span>
-            <span className="relative inline-block">
-              <span className="relative z-10">La Maison</span>
-              <span className="absolute inset-0 blur-2xl bg-orange-500/30 z-0"></span>
+          {/* Main Heading - AI Typography */}
+          <h1 className="text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] font-black text-white mb-10 leading-[0.85] tracking-tighter text-glow">
+            <span className="block italic font-light opacity-50 text-3xl sm:text-5xl tracking-[0.2em] mb-6 drop-shadow-lg">THE GOLDEN</span>
+            <span className="relative">
+              SUNFLOWER
+              <span className="absolute -inset-2 bg-kona-teal/20 blur-[60px] -z-10 rounded-full"></span>
             </span>
           </h1>
 
-          {/* Decorative Divider */}
-          <div className="flex items-center justify-center gap-3 my-8">
-            <div className="w-16 h-px bg-gradient-to-r from-transparent to-slate-500"></div>
-            <UtensilsCrossed className="w-6 h-6 text-orange-500" />
-            <div className="w-16 h-px bg-gradient-to-l from-transparent to-slate-500"></div>
-          </div>
-
-          {/* Tagline */}
-          <p className="text-xl sm:text-2xl md:text-3xl text-orange-400 font-light italic mb-4">
-            "Where Culinary Art Meets Elegance"
+          {/* Description - AI Premium Minimalist */}
+          <p className="text-xl sm:text-2xl text-white/50 mb-16 max-w-2xl mx-auto leading-relaxed font-light tracking-wide drop-shadow-md">
+            Where artificial intelligence meets natural perfection.
+            Experience a sanctuary of <span className="text-white font-medium">hyper-organic dining</span> and sensory excellence.
           </p>
 
-          {/* Description */}
-          <p className="text-base sm:text-lg text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Embark on an extraordinary gastronomic journey where every dish is a
-            masterpiece, crafted with passion and served with perfection.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
+          {/* Dual Action CTAs */}
+          <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-24">
             <button
               onClick={() => navigate('/menu')}
-              className="group relative px-10 py-4 bg-gradient-to-r from-orange-500 to-amber-500 text-white rounded-full font-bold text-lg transition-all transform hover:scale-105 shadow-xl shadow-orange-500/30 overflow-hidden">
-
-              <span className="relative z-10 flex items-center justify-center gap-2">
-                Explore Menu
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-              </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-600 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              className="group relative px-14 py-6 bg-white text-slate-950 rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:scale-105 shadow-[0_0_50px_rgba(255,255,255,0.3)] hover:shadow-[0_0_70px_rgba(255,255,255,0.5)] active:scale-95">
+              Discovery Menu
+              <div className="absolute inset-0 rounded-full border border-white/50 group-hover:scale-125 opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
             </button>
             <button
               onClick={() => scrollToSection('reservations')}
-              className="group px-10 py-4 bg-transparent border-2 border-white/30 text-white hover:border-orange-500 hover:text-orange-400 rounded-full font-bold text-lg transition-all backdrop-blur-sm">
-
-              <span className="flex items-center justify-center gap-2">
-                <Calendar className="w-5 h-5" />
-                Reserve Your Table
-              </span>
+              className="relative px-14 py-6 text-white border border-white/20 rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:bg-white/5 backdrop-blur-md overflow-hidden group">
+              <span className="relative z-10">Private Reservation</span>
+              <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-full transition-all duration-1000"></div>
             </button>
           </div>
 
-          {/* Scroll Indicator */}
-          <div className="flex flex-col items-center gap-2 animate-bounce">
-            <span className="text-xs text-slate-500 uppercase tracking-widest">
-              Scroll to Discover
-            </span>
-            <div className="w-6 h-10 rounded-full border-2 border-slate-600 flex items-start justify-center p-2">
-              <div className="w-1.5 h-3 bg-orange-500 rounded-full animate-pulse"></div>
-            </div>
+          {/* Dynamic Scroll UI */}
+          <div className="flex flex-col items-center gap-4 opacity-40 hover:opacity-100 transition-opacity">
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-white">Infinite Journey</p>
+            <div className="w-px h-24 bg-gradient-to-b from-white to-transparent"></div>
           </div>
         </div>
 
@@ -609,14 +627,14 @@ export function RestaurantFrontend() {
                   Happy Guests
                 </div>
               </div>
-              <div className="text-center p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:border-orange-500/30 transition-colors group">
-                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-orange-500/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Star className="w-6 h-6 text-orange-500 fill-orange-500" />
+              <div className="text-center p-4 rounded-2xl bg-white/40 backdrop-blur-sm border border-white shadow-xl shadow-kona-teal/5 group">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-kona-teal/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Star className="w-6 h-6 text-kona-teal fill-kona-teal" />
                 </div>
-                <div className="text-3xl md:text-4xl font-bold text-white mb-1">
+                <div className="text-3xl md:text-4xl font-black text-kona-maroon mb-1">
                   4.9
                 </div>
-                <div className="text-xs text-slate-400 uppercase tracking-wider">
+                <div className="text-xs text-kona-teal uppercase tracking-widest font-black">
                   Guest Rating
                 </div>
               </div>
@@ -625,83 +643,76 @@ export function RestaurantFrontend() {
         </div>
       </section>
 
-      {/* About Section */}
-      <section id="about" className="py-20 md:py-32 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div>
-              <div className="text-orange-500 font-bold tracking-wider uppercase text-sm mb-2">
-                Our Story
-              </div>
-              <h2 className="text-4xl font-bold text-slate-900 mb-6">
-                Culinary Excellence Since 2009
-              </h2>
-              <p className="text-slate-600 mb-6 leading-relaxed">
-                Founded with a passion for authentic flavors and locally sourced
-                ingredients, La Maison has established itself as a cornerstone
-                of the culinary district. We believe that great food starts with
-                the finest ingredients, which is why we partner directly with
-                local farmers and artisans.
-              </p>
-              <p className="text-slate-600 mb-8 leading-relaxed">
-                Our executive chef brings over 20 years of international
-                experience to your table, crafting dishes that are both
-                innovative and deeply rooted in tradition. Every plate that
-                leaves our kitchen is a testament to our commitment to
-                excellence.
-              </p>
+      {/* About Section - AI Premium Glass Design */}
+      <section id="about" className="relative py-32 overflow-hidden bg-white">
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-kona-teal/5 rounded-full blur-[120px] -z-10"></div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+            <div className="order-2 lg:order-1">
+              <div className="glass-panel p-10 rounded-[3rem] shadow-glow-teal relative overflow-hidden group">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-kona-teal/30 to-transparent"></div>
+                <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-6">
+                  Biological Intelligence
+                </div>
+                <h2 className="text-5xl md:text-6xl font-black text-kona-maroon mb-8 tracking-tighter uppercase leading-[0.9]">
+                  Wholesome <br /> <span className="opacity-40">Innovation</span>
+                </h2>
+                <p className="text-slate-600 mb-8 leading-relaxed font-medium text-lg">
+                  Founded with a passion for organic vibrancy, SUNFLOWER is a
+                  sanctuary for sensory exploration. We believe that great dining
+                  is an algorithm of <span className="text-kona-teal font-black">nature + technology</span>,
+                  sourced directly from local ecosystem partners.
+                </p>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                {[
-                  {
-                    icon: Leaf,
-                    title: 'Farm to Table',
-                    desc: 'Fresh local ingredients'
-                  },
-                  {
-                    icon: ChefHat,
-                    title: 'Expert Chefs',
-                    desc: 'Masterful preparation'
-                  },
-                  {
-                    icon: Wine,
-                    title: 'Fine Wines',
-                    desc: 'Curated selection'
-                  }].
-                  map((feature, idx) =>
-                    <div
-                      key={idx}
-                      className="bg-slate-50 p-4 rounded-xl border border-slate-100">
-
-                      <feature.icon className="w-8 h-8 text-orange-500 mb-3" />
-                      <h3 className="font-bold text-slate-900 mb-1">
-                        {feature.title}
-                      </h3>
-                      <p className="text-xs text-slate-500">{feature.desc}</p>
-                    </div>
-                  )}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                  {[
+                    {
+                      icon: Leaf,
+                      title: 'Eco-System',
+                    },
+                    {
+                      icon: Star,
+                      title: 'Pure-Grade',
+                    },
+                    {
+                      icon: Wine,
+                      title: 'Sensory-IQ',
+                    }].
+                    map((feature, idx) =>
+                      <div
+                        key={idx}
+                        className="glass-card p-4 rounded-2xl flex flex-col items-center text-center group/item hover:bg-white transition-all">
+                        <feature.icon className="w-6 h-6 text-kona-teal mb-3 group-hover/item:scale-125 transition-transform" />
+                        <h3 className="font-black text-kona-maroon uppercase text-[8px] tracking-[0.2em]">
+                          {feature.title}
+                        </h3>
+                      </div>
+                    )}
+                </div>
               </div>
             </div>
-            <div className="relative">
-              <AnimatedBackground />
-              <div className="aspect-square rounded-2xl overflow-hidden shadow-2xl">
-                <div className="w-full h-full bg-slate-200 flex items-center justify-center bg-[url('https://images.unsplash.com/photo-1559339352-11d035aa65de?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center"></div>
+            <div className="relative order-1 lg:order-2">
+              <div className="absolute inset-0 bg-mesh opacity-20 blur-3xl -z-10"></div>
+              <div className="aspect-[4/5] rounded-[4rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.1)] border-8 border-white group">
+                <div 
+                  className="w-full h-full bg-kona-light flex items-center justify-center bg-cover bg-center group-hover:scale-110 transition-transform duration-1000 grayscale-[0.2] hover:grayscale-0"
+                  style={{ backgroundImage: `url('https://i.ibb.co.com/nq1CgR1W/restaurant-decoration.jpg')` }}
+                ></div>
               </div>
-              <div className="absolute -bottom-8 -left-8 bg-white p-6 rounded-xl shadow-xl border border-slate-100 max-w-xs hidden md:block">
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Star className="w-6 h-6 text-orange-500 fill-orange-500" />
+              <div className="absolute -bottom-10 -right-10 glass-panel p-8 rounded-[2rem] shadow-2xl max-w-xs hidden xl:block animate-float">
+                <div className="flex items-center gap-5 mb-4">
+                  <div className="w-14 h-14 bg-kona-maroon rounded-full flex items-center justify-center text-white shadow-xl">
+                    <Star className="w-7 h-7 fill-white" />
                   </div>
                   <div>
-                    <div className="font-bold text-slate-900">Voted #1</div>
-                    <div className="text-sm text-slate-500">
-                      Best Fine Dining 2023
+                    <div className="text-2xl font-black text-kona-maroon">4.9/5</div>
+                    <div className="text-[10px] text-kona-teal font-black uppercase tracking-widest">
+                      AI Verified Excellence
                     </div>
                   </div>
                 </div>
-                <p className="text-sm text-slate-600 italic">
-                  "An absolute masterpiece of culinary art. The best dining
-                  experience in the city."
+                <p className="text-sm text-slate-500 font-medium leading-relaxed italic">
+                  "A masterpiece of organic luxury."
                 </p>
               </div>
             </div>
@@ -709,36 +720,41 @@ export function RestaurantFrontend() {
         </div>
       </section>
 
-      {/* Menu Section */}
-      <section id="menu" className="py-20 bg-slate-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Our Menu</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              Crafted with passion, served with love. Explore our seasonal
-              selection of exquisite dishes.
+      {/* Menu Section - AI Optimized Filter */}
+      <section id="menu" className="py-32 bg-slate-50 overflow-hidden relative">
+        <div className="absolute top-1/2 left-0 w-96 h-96 bg-kona-pink/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
+            <div className="max-w-xl">
+              <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-4">
+                Curated Selection
+              </div>
+              <h2 className="text-5xl md:text-7xl font-black text-kona-maroon tracking-tighter uppercase leading-[0.85]">
+                Discovery <br /> <span className="text-kona-teal">Prototypes</span>
+              </h2>
+            </div>
+            <p className="text-slate-500 font-medium max-w-sm text-right hidden md:block">
+              Each dish is a masterpiece of seasonal engineering and flavor optimization.
             </p>
           </div>
 
           {/* Categories */}
-          <div className="flex justify-center gap-2 md:gap-4 mb-12 flex-wrap">
-            {(
-              [
-                'All',
-                'Appetizers',
-                'Main Course',
-                'Desserts',
-                'Beverages'] as
+          <div className="flex flex-wrap gap-4 mb-16">
+            {([
+              'All',
+              'Appetizers',
+              'Main Course',
+              'Desserts',
+              'Beverages'] as
               const).
               map((category) =>
                 <button
                   key={category}
                   onClick={() => setActiveCategory(category)}
                   className={`
-                  px-6 py-2 rounded-full text-sm font-medium transition-all
-                  ${activeCategory === category ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/25 scale-105' : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'}
+                  px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500
+                  ${activeCategory === category ? 'bg-kona-maroon text-white shadow-[0_0_30px_rgba(0,0,0,0.2)] scale-110' : 'bg-white text-slate-400 hover:text-kona-maroon border border-slate-100 hover:bg-slate-50'}
                 `}>
-
                   {category}
                 </button>
               )}
@@ -750,54 +766,57 @@ export function RestaurantFrontend() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
             </div>
           ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {filteredItems.map((item) => (
                 <div
                   key={item._id}
-                  className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group border border-slate-100">
+                  className="glass-card group overflow-hidden rounded-[2.5rem] hover:bg-white transition-all duration-700 border border-slate-100 shadow-xl hover:shadow-2xl">
 
-                  <div className="h-48 bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center relative overflow-hidden">
+                  <div className="h-64 relative overflow-hidden">
                     {item.image ? (
                       <img
                         src={item.image}
                         alt={item.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 grayscale-[0.3] group-hover:grayscale-0"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
                         }}
                       />
                     ) : (
-                      <UtensilsCrossed className="w-12 h-12 text-orange-200 group-hover:scale-110 transition-transform duration-500" />
+                      <div className="w-full h-full bg-mesh opacity-20 flex items-center justify-center">
+                        <UtensilsCrossed className="w-12 h-12 text-slate-300 group-hover:scale-110 transition-transform duration-500" />
+                      </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                     {!item.isAvailable &&
-                      <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
-                        <span className="px-4 py-1 bg-white text-slate-900 text-sm font-bold rounded-full transform -rotate-3 shadow-lg">
-                          Sold Out
+                      <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center">
+                        <span className="px-6 py-2 bg-white text-slate-950 text-[10px] font-black uppercase tracking-widest rounded-full shadow-2xl">
+                          Depleted
                         </span>
                       </div>
                     }
                   </div>
-                  <div className="p-6">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-xl font-bold text-slate-900">
+                  <div className="p-8">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-2xl font-black text-kona-maroon tracking-tighter uppercase">
                         {item.name}
                       </h3>
-                      <span className="text-lg font-bold text-orange-500">
+                      <span className="text-xl font-bold text-kona-teal">
                         ${item.price}
                       </span>
                     </div>
-                    <p className="text-slate-500 text-sm mb-4 line-clamp-2">
+                    <p className="text-slate-500 text-sm mb-8 leading-relaxed font-light line-clamp-2 italic">
                       {item.description}
                     </p>
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-100">
-                      <span className="text-xs font-medium px-3 py-1 rounded-full bg-slate-100 text-slate-600">
+                    <div className="flex items-center justify-between pt-6 border-t border-slate-50">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-slate-300">
                         {item.category}
                       </span>
                       <button
                         onClick={() => addToCart(item)}
                         disabled={!item.isAvailable}
-                        className="bg-orange-500 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-orange-600 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
-                        <Plus className="w-4 h-4" /> Add
+                        className="w-12 h-12 rounded-full bg-kona-teal flex items-center justify-center text-white hover:bg-kona-maroon transition-all disabled:opacity-50 disabled:cursor-not-allowed group/btn shadow-lg shadow-kona-teal/20">
+                        <Plus className="w-5 h-5 group-hover/btn:rotate-90 transition-transform" />
                       </button>
                     </div>
                   </div>
@@ -813,15 +832,17 @@ export function RestaurantFrontend() {
         <div className="fixed inset-0 z-[100] overflow-hidden">
           <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={() => setIsCartOpen(false)} />
           <div className="absolute inset-y-0 right-0 max-w-full flex">
-            <div className="w-screen max-w-md bg-white shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
-              <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <ShoppingBasket className="w-6 h-6 text-orange-500" />
-                  <h2 className="text-xl font-bold text-slate-800">
-                    {checkoutStep === 'CART' ? 'Your Order' : 'Delivery Details'}
+            <div className="w-screen max-w-md glass-panel shadow-[0_0_100px_rgba(0,0,0,0.5)] flex flex-col animate-in slide-in-from-right duration-500 border-l border-white/10">
+              <div className="p-8 border-b border-white/5 flex items-center justify-between bg-slate-950/50 backdrop-blur-3xl">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-white/5 rounded-full flex items-center justify-center border border-white/10">
+                    <ShoppingBasket className="w-6 h-6 text-white" />
+                  </div>
+                  <h2 className="text-2xl font-black text-white tracking-tighter uppercase text-glow">
+                    {checkoutStep === 'CART' ? 'System Order' : 'Protocol'}
                   </h2>
                 </div>
-                <button onClick={() => setIsCartOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                <button onClick={() => setIsCartOpen(false)} className="text-slate-400 hover:text-white transition-colors">
                   <X className="w-6 h-6" />
                 </button>
               </div>
@@ -831,38 +852,38 @@ export function RestaurantFrontend() {
                   <div className="flex-1 overflow-y-auto p-6 space-y-6">
                     {cart.length === 0 ? (
                       <div className="h-full flex flex-col items-center justify-center text-center">
-                        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
-                          <ShoppingBasket className="w-10 h-10 text-slate-300" />
+                        <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/10">
+                          <ShoppingBasket className="w-10 h-10 text-white/20" />
                         </div>
-                        <p className="text-slate-500 font-medium">Your cart is empty</p>
-                        <button onClick={() => setIsCartOpen(false)} className="mt-4 text-orange-500 font-bold hover:underline">
-                          Explore our menu
+                        <p className="text-white/40 font-medium">System empty</p>
+                        <button onClick={() => setIsCartOpen(false)} className="mt-4 text-kona-teal font-black uppercase text-[10px] tracking-widest hover:underline">
+                          Explore Prototypes
                         </button>
                       </div>
                     ) : (
                       cart.map((i) => (
-                        <div key={i.item._id} className="flex gap-4">
-                          <div className="w-20 h-20 bg-slate-100 rounded-xl flex items-center justify-center">
-                            <UtensilsCrossed className="w-8 h-8 text-slate-300" />
+                        <div key={i.item._id} className="flex gap-4 p-4 glass-card rounded-2xl border border-white/5">
+                          <div className="w-20 h-20 bg-white/5 rounded-xl flex items-center justify-center border border-white/10">
+                            <UtensilsCrossed className="w-8 h-8 text-white/20" />
                           </div>
                           <div className="flex-1">
                             <div className="flex justify-between mb-1">
-                              <h4 className="font-bold text-slate-800">{i.item.name}</h4>
-                              <button onClick={() => removeFromCart(i.item._id)} className="text-slate-400 hover:text-red-500">
+                              <h4 className="font-black text-white uppercase text-xs tracking-wider">{i.item.name}</h4>
+                              <button onClick={() => removeFromCart(i.item._id)} className="text-white/20 hover:text-rose-500 transition-colors">
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
-                            <div className="flex justify-between items-center">
-                              <div className="flex items-center gap-3 bg-slate-50 rounded-lg p-1">
-                                <button onClick={() => updateQuantity(i.item._id, -1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
+                            <div className="flex justify-between items-center mt-4">
+                              <div className="flex items-center gap-3 bg-white/5 rounded-full p-1 border border-white/10">
+                                <button onClick={() => updateQuantity(i.item._id, -1)} className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-slate-900 transition-all active:scale-90">
                                   <Minus className="w-3 h-3" />
                                 </button>
-                                <span className="text-sm font-bold w-4 text-center">{i.quantity}</span>
-                                <button onClick={() => updateQuantity(i.item._id, 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded shadow-sm text-slate-600 hover:text-orange-500">
+                                <span className="text-xs font-black text-white w-4 text-center">{i.quantity}</span>
+                                <button onClick={() => updateQuantity(i.item._id, 1)} className="w-6 h-6 flex items-center justify-center bg-white rounded-full text-slate-900 transition-all active:scale-90">
                                   <Plus className="w-3 h-3" />
                                 </button>
                               </div>
-                              <span className="font-bold text-orange-500">${(i.item.price * i.quantity).toFixed(2)}</span>
+                              <span className="font-black text-kona-teal text-sm">${(i.item.price * i.quantity).toFixed(2)}</span>
                             </div>
                           </div>
                         </div>
@@ -871,90 +892,88 @@ export function RestaurantFrontend() {
                   </div>
 
                   {cart.length > 0 && (
-                    <div className="p-6 bg-slate-50 border-t border-slate-100 space-y-4">
-                      <div className="flex justify-between text-slate-500 text-sm">
-                        <span>Subtotal</span>
-                        <span>${cartTotal.toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between text-slate-900 font-bold text-lg">
-                        <span>Total</span>
-                        <span>${cartTotal.toFixed(2)}</span>
+                    <div className="p-8 glass-card border-t border-white/10 space-y-6">
+                      <div className="flex justify-between text-white/40 text-[10px] font-black uppercase tracking-widest">
+                        <span>Total Assets</span>
+                        <span className="text-white">${cartTotal.toFixed(2)}</span>
                       </div>
                       <button
                         onClick={handleCheckoutClick}
-                        className="w-full bg-orange-500 text-white py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20"
+                        className="w-full bg-white text-slate-950 py-5 rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:scale-105 transition-all shadow-glow"
                       >
-                        Checkout
+                        Initialize Checkout
                       </button>
                     </div>
                   )}
                 </>
               ) : (
-                <div className="flex-1 overflow-y-auto p-6">
-                  <button 
+                <div className="flex-1 overflow-y-auto p-8">
+                  <button
                     onClick={() => setCheckoutStep('CART')}
-                    className="flex items-center gap-2 text-slate-400 hover:text-orange-500 transition-colors font-bold text-xs uppercase tracking-wider mb-6"
+                    className="flex items-center gap-2 text-white/40 hover:text-white transition-colors font-black text-[10px] uppercase tracking-[0.3em] mb-10"
                   >
-                    <ArrowLeft className="w-4 h-4" /> Back to Cart
+                    <ArrowLeft className="w-4 h-4" /> Return to Assets
                   </button>
 
-                  <form onSubmit={handlePlaceOrder} className="space-y-5">
-                    <div>
-                       <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Full Name</label>
-                       <div className="relative">
-                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                          <input 
-                            type="text" 
+                  <form onSubmit={handlePlaceOrder} className="space-y-8">
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Identity</label>
+                        <div className="relative">
+                          <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <input
+                            type="text"
                             required
-                            placeholder="Your name"
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none text-slate-700 transition-all"
+                            placeholder="Full Name"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium"
                             value={addressData.name}
-                            onChange={(e) => setAddressData({...addressData, name: e.target.value})}
+                            onChange={(e) => setAddressData({ ...addressData, name: e.target.value })}
                           />
-                       </div>
-                    </div>
+                        </div>
+                      </div>
 
-                    <div>
-                       <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Phone Number</label>
-                       <div className="relative">
-                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                          <input 
-                            type="tel" 
+                      <div className="space-y-2">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Communication</label>
+                        <div className="relative">
+                          <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <input
+                            type="tel"
                             required
-                            placeholder="Contact number"
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none text-slate-700 transition-all"
+                            placeholder="Phone Number"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium"
                             value={addressData.phone}
-                            onChange={(e) => setAddressData({...addressData, phone: e.target.value})}
+                            onChange={(e) => setAddressData({ ...addressData, phone: e.target.value })}
                           />
-                       </div>
-                    </div>
+                        </div>
+                      </div>
 
-                    <div>
-                       <label className="block text-sm font-medium text-slate-700 mb-1.5 ml-1">Delivery Address</label>
-                       <div className="relative">
-                          <MapPin className="absolute left-4 top-4 w-4 h-4 text-slate-400" />
-                          <textarea 
+                      <div className="space-y-2">
+                        <label className="block text-[10px] font-black uppercase tracking-widest text-white/40 ml-1">Coordinates</label>
+                        <div className="relative">
+                          <MapPin className="absolute left-4 top-5 w-4 h-4 text-white/20" />
+                          <textarea
                             required
-                            placeholder="Complete street address"
+                            placeholder="Delivery Address"
                             rows={4}
-                            className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-10 pr-4 py-3 focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500 outline-none text-slate-700 transition-all resize-none"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all resize-none font-medium"
                             value={addressData.deliveryAddress}
-                            onChange={(e) => setAddressData({...addressData, deliveryAddress: e.target.value})}
+                            onChange={(e) => setAddressData({ ...addressData, deliveryAddress: e.target.value })}
                           />
-                       </div>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="pt-6 border-t border-slate-100 mt-8">
-                       <div className="flex justify-between items-center mb-6">
-                          <span className="text-slate-500 font-medium">Payable Amount</span>
-                          <span className="text-2xl font-bold text-slate-900">${cartTotal.toFixed(2)}</span>
-                       </div>
-                       <button
+                    <div className="pt-8 border-t border-white/10">
+                      <div className="flex justify-between items-center mb-8">
+                        <span className="text-white/40 font-black uppercase text-[10px] tracking-widest">Payable Assets</span>
+                        <span className="text-3xl font-black text-white tracking-tighter">${cartTotal.toFixed(2)}</span>
+                      </div>
+                      <button
                         type="submit"
                         disabled={isOrdering}
-                        className="w-full bg-orange-500 text-white py-4 rounded-xl font-bold hover:bg-orange-600 transition-all shadow-lg shadow-orange-500/20 disabled:opacity-50"
+                        className="w-full bg-kona-teal text-white py-5 rounded-full font-black text-[10px] uppercase tracking-[0.3em] hover:scale-105 transition-all shadow-glow-teal disabled:opacity-50"
                       >
-                        {isOrdering ? 'Placing Order...' : 'Place Order'}
+                        {isOrdering ? 'Processing...' : 'Confirm Order'}
                       </button>
                     </div>
                   </form>
@@ -969,278 +988,174 @@ export function RestaurantFrontend() {
       {cart.length > 0 && !isCartOpen && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-8 right-8 z-50 bg-slate-900 text-white p-4 rounded-2xl shadow-2xl flex items-center gap-3 hover:scale-105 transition-all group overflow-hidden"
+          className="fixed bottom-10 right-10 z-[60] bg-slate-950 text-white px-8 py-5 rounded-full shadow-glow flex items-center gap-5 hover:scale-105 transition-all group border border-white/10 overflow-hidden"
         >
-          <div className="absolute inset-0 bg-orange-500 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
-          <div className="relative flex items-center gap-3">
+          <div className="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-500" />
+          <div className="relative flex items-center gap-5">
             <div className="relative">
-              <ShoppingBasket className="w-6 h-6" />
-              <span className="absolute -top-2 -right-2 bg-orange-500 text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-slate-900 group-hover:bg-slate-900 transition-colors">
+              <ShoppingBasket className="w-6 h-6 group-hover:text-slate-950 transition-colors" />
+              <span className="absolute -top-3 -right-3 bg-kona-teal text-white text-[10px] font-black w-6 h-6 rounded-full flex items-center justify-center border-2 border-slate-950 group-hover:border-white transition-all">
                 {cart.reduce((s, i) => s + i.quantity, 0)}
               </span>
             </div>
-            <span className="font-bold text-sm">View Order • ${cartTotal.toFixed(2)}</span>
+            <span className="font-black text-xs uppercase tracking-widest group-hover:text-slate-950 transition-colors">
+              Assets Protocol • ${cartTotal.toFixed(2)}
+            </span>
           </div>
         </button>
       )}
 
-      {/* Reservation Section */}
-      <section id="reservations" className="py-20 bg-orange-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-orange-100">
-            <div className="grid grid-cols-1 lg:grid-cols-2">
-              <div className="p-8 md:p-12 lg:p-16">
-                <div className="text-orange-500 font-bold tracking-wider uppercase text-sm mb-2">
-                  Reservations
-                </div>
-                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-6">
-                  Book Your Table
-                </h2>
-                <p className="text-slate-600 mb-8">
-                  Join us for an unforgettable dining experience. For parties
-                  larger than 12, please contact us directly.
-                </p>
-
-                <form
-                  className="space-y-6"
-                  onSubmit={handleReservationSubmit}>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Full Name
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                        placeholder="John Doe"
-                        value={reservation.name}
-                        onChange={(e) =>
-                          setReservation({
-                            ...reservation,
-                            name: e.target.value
-                          })
-                        } />
-
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Phone Number
-                      </label>
-                      <input
-                        type="tel"
-                        className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                        placeholder="(555) 123-4567"
-                        value={reservation.phone}
-                        onChange={(e) =>
-                          setReservation({
-                            ...reservation,
-                            phone: e.target.value
-                          })
-                        } />
-
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Date
-                      </label>
-                      <div className="relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                        <input
-                          type="date"
-                          className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all"
-                          value={reservation.date}
-                          onChange={(e) =>
-                            setReservation({
-                              ...reservation,
-                              date: e.target.value
-                            })
-                          } />
-
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Time
-                      </label>
-                      <div className="relative">
-                        <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                        <select
-                          className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all appearance-none bg-white"
-                          value={reservation.time}
-                          onChange={(e) =>
-                            setReservation({
-                              ...reservation,
-                              time: e.target.value
-                            })
-                          }>
-
-                          <option value="">Select time</option>
-                          <option value="17:00">5:00 PM</option>
-                          <option value="17:30">5:30 PM</option>
-                          <option value="18:00">6:00 PM</option>
-                          <option value="18:30">6:30 PM</option>
-                          <option value="19:00">7:00 PM</option>
-                          <option value="19:30">7:30 PM</option>
-                          <option value="20:00">8:00 PM</option>
-                          <option value="20:30">8:30 PM</option>
-                          <option value="21:00">9:00 PM</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-slate-700 mb-2">
-                        Guests
-                      </label>
-                      <div className="relative">
-                        <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
-                        <select
-                          className="w-full pl-10 pr-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all appearance-none bg-white"
-                          value={reservation.guests}
-                          onChange={(e) =>
-                            setReservation({
-                              ...reservation,
-                              guests: e.target.value
-                            })
-                          }>
-
-                          {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(
-                            (num) =>
-                              <option key={num} value={num}>
-                                {num} {num === 1 ? 'Guest' : 'Guests'}
-                              </option>
-
-                          )}
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-2">
-                      Special Requests
-                    </label>
-                    <textarea
-                      className="w-full px-4 py-3 rounded-lg border border-slate-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition-all h-32 resize-none"
-                      placeholder="Allergies, special occasions, seating preferences..."
-                      value={reservation.requests}
-                      onChange={(e) =>
-                        setReservation({
-                          ...reservation,
-                          requests: e.target.value
-                        })
-                      }>
-                    </textarea>
-                  </div>
-
-                  <button
-                    disabled={isReserving}
-                    className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold py-4 rounded-lg transition-all shadow-lg shadow-orange-500/20 transform hover:-translate-y-1 disabled:opacity-70 disabled:cursor-not-allowed">
-                    {isReserving ? 'Processing...' : 'Confirm Reservation'}
-                  </button>
-                </form>
+      {/* Reservation Section - AI Optimization */}
+      <section id="reservations" className="py-32 bg-slate-950 relative overflow-hidden">
+        <div className="absolute inset-0 bg-mesh opacity-10"></div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
+          <div className="glass-panel p-16 rounded-[4rem] border border-white/10 shadow-glow-teal flex flex-col lg:flex-row items-center gap-20">
+            <div className="flex-1">
+              <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-6">
+                Reservation Systems
               </div>
-              <div className="bg-slate-900 p-8 md:p-12 lg:p-16 text-white flex flex-col justify-center relative overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550966871-3ed3c47e2ce2?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80')] bg-cover bg-center opacity-20"></div>
-                <div className="relative z-10 space-y-12">
-                  <div>
-                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                      <Clock className="w-6 h-6 text-orange-500" /> Opening
-                      Hours
-                    </h3>
-                    <div className="space-y-3 text-slate-300">
-                      <div className="flex justify-between border-b border-slate-800 pb-2">
-                        <span>Mon - Thu</span>
-                        <span>11:00 AM - 10:00 PM</span>
-                      </div>
-                      <div className="flex justify-between border-b border-slate-800 pb-2">
-                        <span>Fri - Sat</span>
-                        <span>11:00 AM - 11:00 PM</span>
-                      </div>
-                      <div className="flex justify-between border-b border-slate-800 pb-2">
-                        <span>Sunday</span>
-                        <span>10:00 AM - 9:00 PM</span>
-                      </div>
-                    </div>
-                  </div>
+              <h2 className="text-5xl md:text-7xl font-black text-white mb-8 tracking-tighter uppercase leading-[0.85]">
+                Secure Your <br /> <span className="text-kona-teal">Experience</span>
+              </h2>
+              <p className="text-white/40 text-lg leading-relaxed font-light mb-12 italic">
+                Our reservation algorithm ensures optimal environment and service
+                orchestration for your party. Select your coordinates below.
+              </p>
 
-                  <div>
-                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                      <MapPin className="w-6 h-6 text-orange-500" /> Location
-                    </h3>
-                    <p className="text-slate-300 leading-relaxed">
-                      123 Gourmet Avenue
-                      <br />
-                      Culinary District, NY 10012
-                      <br />
-                      United States
-                    </p>
-                  </div>
-
-                  <div>
-                    <h3 className="text-2xl font-bold mb-6 flex items-center gap-3">
-                      <Phone className="w-6 h-6 text-orange-500" /> Contact
-                    </h3>
-                    <p className="text-slate-300 leading-relaxed">
-                      (555) 123-4567
-                      <br />
-                      reservations@lamaison.com
-                    </p>
-                  </div>
+              <form onSubmit={handleReservationSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="relative">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Guest Name"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium text-xs placeholder:text-white/20"
+                    value={reservation.name}
+                    onChange={(e) => setReservation({ ...reservation, name: e.target.value })}
+                  />
                 </div>
-              </div>
+                <div className="relative">
+                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Communication Port"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium text-xs placeholder:text-white/20"
+                    value={reservation.phone}
+                    onChange={(e) => setReservation({ ...reservation, phone: e.target.value })}
+                  />
+                </div>
+                <div className="relative md:col-span-2">
+                  <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <input
+                    type="email"
+                    required
+                    placeholder="Digital Signaling (Email)"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium text-xs placeholder:text-white/20"
+                    value={reservation.email}
+                    onChange={(e) => setReservation({ ...reservation, email: e.target.value })}
+                  />
+                </div>
+                <div className="relative">
+                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <input
+                    type="date"
+                    required
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium text-xs [color-scheme:dark]"
+                    value={reservation.date}
+                    onChange={(e) => setReservation({ ...reservation, date: e.target.value })}
+                  />
+                </div>
+                <div className="relative">
+                  <Clock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <input
+                    type="time"
+                    required
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium text-xs [color-scheme:dark]"
+                    value={reservation.time}
+                    onChange={(e) => setReservation({ ...reservation, time: e.target.value })}
+                  />
+                </div>
+                <div className="relative md:col-span-2">
+                  <Users className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
+                  <select
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-12 pr-4 py-4 focus:ring-2 focus:ring-kona-teal outline-none text-white transition-all font-medium text-xs appearance-none"
+                    value={reservation.guests}
+                    onChange={(e) => setReservation({ ...reservation, guests: e.target.value })}
+                  >
+                    {[1, 2, 3, 4, 5, 6, 8, 10, 12].map(n => (
+                      <option key={n} value={n} className="bg-slate-900">{n} Participants</option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  disabled={isReserving}
+                  className="md:col-span-2 w-full bg-white text-slate-950 py-6 rounded-2xl font-black text-[10px] uppercase tracking-[0.4em] hover:scale-[1.02] transition-all shadow-glow disabled:opacity-50"
+                >
+                  {isReserving ? 'Processing Sequence...' : 'Initialize Booking'}
+                </button>
+              </form>
+            </div>
+
+            <div className="w-full lg:w-1/3 aspect-square rounded-[3rem] overflow-hidden border-8 border-white/5 relative group">
+              <img
+                src="https://images.unsplash.com/photo-1544148103-0773bf10d330?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80"
+                alt="Luxury Table"
+                className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-1000 scale-110 group-hover:scale-100"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent opacity-60"></div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Contact Section */}
-      <section id="contact" className="py-20 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-slate-900 mb-4">Visit Us</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">
-              We look forward to welcoming you to La Maison.
-            </p>
+      {/* Contact Section - AI Information Feed */}
+      <section id="contact" className="py-32 bg-white relative overflow-hidden">
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-kona-teal/5 rounded-full blur-[100px] -z-10"></div>
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center mb-24">
+            <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-6">
+              Contact Nodes
+            </div>
+            <h2 className="text-5xl md:text-7xl font-black text-kona-maroon mb-4 tracking-tighter uppercase leading-[0.85]">
+              System <span className="opacity-40">Locations</span>
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {[
               {
                 icon: MapPin,
-                title: 'Our Location',
+                title: 'Coordinates',
                 lines: ['123 Gourmet Avenue', 'Culinary District, NY 10012']
               },
               {
                 icon: Clock,
-                title: 'Opening Hours',
+                title: 'Operation Hours',
                 lines: [
-                  'Mon-Thu: 11am - 10pm',
-                  'Fri-Sat: 11am - 11pm',
-                  'Sun: 10am - 9pm']
+                  'Daily: 11:00 — 22:00',
+                  'Weekend: 10:00 — 23:00']
 
               },
               {
                 icon: Phone,
-                title: 'Get in Touch',
-                lines: ['(555) 123-4567', 'hello@lamaison.com']
+                title: 'Emergency Feed',
+                lines: ['(555) 123-4567', 'hello@sunflower.com']
               }].
               map((item, idx) =>
                 <div
                   key={idx}
-                  className="bg-slate-50 p-8 rounded-2xl text-center hover:shadow-lg transition-all border border-slate-100 group">
+                  className="glass-panel p-10 rounded-[3rem] text-center hover:bg-slate-50 transition-all border border-slate-100 group shadow-lg hover:shadow-2xl">
 
-                  <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-6 shadow-sm group-hover:scale-110 transition-transform">
-                    <item.icon className="w-8 h-8 text-orange-500" />
+                  <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-sm group-hover:rotate-12 transition-transform">
+                    <item.icon className="w-8 h-8 text-kona-teal" />
                   </div>
-                  <h3 className="text-xl font-bold text-slate-900 mb-4">
+                  <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-kona-maroon mb-6">
                     {item.title}
                   </h3>
                   {item.lines.map((line, i) =>
-                    <p key={i} className="text-slate-600">
+                    <p key={i} className="text-slate-500 font-medium tracking-wide">
                       {line}
                     </p>
                   )}
@@ -1250,218 +1165,69 @@ export function RestaurantFrontend() {
         </div>
       </section>
 
-      {/* Footer */}
-      < footer className="relative bg-slate-900 text-white overflow-hidden" >
-        {/* Decorative Top Gradient */}
-        < div className="h-1 bg-gradient-to-r from-orange-600 via-amber-500 to-orange-600" ></div >
+      {/* Footer - AI Core Design */}
+      <footer className="relative bg-slate-950 text-white overflow-hidden pt-32 pb-12">
+        {/* Abstract Background Highlights */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[1px] bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+        <div className="absolute bottom-0 right-0 w-96 h-96 bg-kona-teal/5 rounded-full blur-[120px] -z-10"></div>
 
-        {/* Decorative Background Elements */}
-        < div className="absolute top-20 right-0 w-96 h-96 bg-orange-500/5 rounded-full blur-3xl" ></div >
-        <div className="absolute bottom-0 left-0 w-72 h-72 bg-amber-500/5 rounded-full blur-3xl"></div>
-
-        {/* Main Footer Content */}
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
-          {/* Top Section - Logo & Description */}
-          <div className="flex flex-col items-center text-center mb-16">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="bg-gradient-to-br from-orange-500 to-amber-500 p-3 rounded-xl shadow-lg shadow-orange-500/20">
-                <ChefHat className="w-8 h-8 text-white" />
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-24 items-center">
+            <div>
+              <div className="flex items-center gap-4 mb-8">
+                <div className="relative w-16 h-16 animate-float">
+                  <img
+                    src={logo}
+                    alt="Sunflower Logo"
+                    className="w-full h-full object-cover rounded-full border border-white/20 shadow-glow"
+                  />
+                </div>
+                <span className="text-4xl font-black tracking-tighter uppercase text-glow">
+                  SUNFLOWER
+                </span>
               </div>
-              <span className="text-3xl font-bold tracking-tight">
-                La Maison
-              </span>
-            </div>
-            <div className="flex items-center gap-3 mb-6">
-              <div className="w-12 h-px bg-gradient-to-r from-transparent to-orange-500"></div>
-              <UtensilsCrossed className="w-4 h-4 text-orange-500" />
-              <div className="w-12 h-px bg-gradient-to-l from-transparent to-orange-500"></div>
-            </div>
-            <p className="text-slate-400 max-w-md leading-relaxed">
-              Experience the finest culinary delights in a warm and inviting
-              atmosphere. Where every meal is a celebration of flavor and
-              artistry.
-            </p>
-          </div>
-
-          {/* Middle Section - 4 Column Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 mb-16 pb-16 border-b border-slate-800">
-            {/* Quick Links */}
-            <div>
-              <h4 className="text-sm font-bold uppercase tracking-widest text-orange-500 mb-6">
-                Navigate
-              </h4>
-              <ul className="space-y-4">
-                {[
-                  {
-                    label: 'Home',
-                    id: 'home'
-                  },
-                  {
-                    label: 'About Us',
-                    id: 'about'
-                  },
-                  {
-                    label: 'Our Menu',
-                    id: 'menu'
-                  },
-                  {
-                    label: 'Reservations',
-                    id: 'reservations'
-                  },
-                  {
-                    label: 'Contact',
-                    id: 'contact'
-                  }].
-                  map((item) =>
-                    <li key={item.id}>
-                      <button
-                        onClick={() => scrollToSection(item.id)}
-                        className="text-slate-400 hover:text-orange-400 transition-colors flex items-center gap-2 group">
-
-                        <ArrowRight className="w-3 h-3 opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all text-orange-500" />
-                        <span>{item.label}</span>
-                      </button>
-                    </li>
-                  )}
-              </ul>
-            </div>
-
-            {/* Opening Hours */}
-            <div>
-              <h4 className="text-sm font-bold uppercase tracking-widest text-orange-500 mb-6">
-                Hours
-              </h4>
-              <ul className="space-y-4">
-                <li className="flex justify-between text-slate-400">
-                  <span>Mon – Thu</span>
-                  <span className="text-slate-300">11am – 10pm</span>
-                </li>
-                <li className="flex justify-between text-slate-400">
-                  <span>Fri – Sat</span>
-                  <span className="text-slate-300">11am – 11pm</span>
-                </li>
-                <li className="flex justify-between text-slate-400">
-                  <span>Sunday</span>
-                  <span className="text-slate-300">10am – 9pm</span>
-                </li>
-                <li className="pt-2 border-t border-slate-800">
-                  <div className="flex items-center gap-2 text-green-400 text-sm">
-                    <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse"></span>
-                    Open Now
-                  </div>
-                </li>
-              </ul>
-            </div>
-
-            {/* Contact Info */}
-            <div>
-              <h4 className="text-sm font-bold uppercase tracking-widest text-orange-500 mb-6">
-                Contact
-              </h4>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3 text-slate-400">
-                  <MapPin className="w-5 h-5 text-orange-500 mt-0.5 flex-shrink-0" />
-                  <span>
-                    123 Gourmet Avenue
-                    <br />
-                    Culinary District, NY 10012
-                  </span>
-                </li>
-                <li className="flex items-center gap-3 text-slate-400">
-                  <Phone className="w-5 h-5 text-orange-500 flex-shrink-0" />
-                  <span>(555) 123-4567</span>
-                </li>
-                <li className="flex items-center gap-3 text-slate-400">
-                  <Calendar className="w-5 h-5 text-orange-500 flex-shrink-0" />
-                  <span>reservations@lamaison.com</span>
-                </li>
-              </ul>
-            </div>
-
-            {/* Newsletter */}
-            <div>
-              <h4 className="text-sm font-bold uppercase tracking-widest text-orange-500 mb-6">
-                Newsletter
-              </h4>
-              <p className="text-slate-400 mb-6 text-sm leading-relaxed">
-                Subscribe for exclusive offers, seasonal menus, and special
-                event invitations.
+              <p className="text-white/40 text-lg max-w-md leading-relaxed font-light mb-10">
+                A sanctuary where <span className="text-white">biological perfection</span> meets
+                advanced culinary engineering. Redefining the future of wholesome dining.
               </p>
-              <div className="space-y-3">
-                <input
-                  type="email"
-                  placeholder="Your email address"
-                  className="w-full bg-slate-800/80 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none text-white placeholder-slate-500 transition-all" />
 
-                <button className="w-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white px-4 py-3 rounded-xl font-medium transition-all text-sm shadow-lg shadow-orange-500/20 hover:shadow-orange-500/30">
-                  Subscribe
-                </button>
+              <div className="flex gap-4">
+                {[Instagram, Facebook, Twitter].map((Icon, idx) => (
+                  <a key={idx} href="#" className="w-12 h-12 glass-card rounded-full flex items-center justify-center text-white/50 hover:text-white hover:bg-white/10 transition-all border border-white/5 group">
+                    <Icon className="w-5 h-5 group-hover:scale-110 transition-transform" />
+                  </a>
+                ))}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-10">
+              <div>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8">Navigate</h4>
+                <ul className="space-y-4">
+                  {['Home', 'Menu', 'About', 'Reservation'].map(item => (
+                    <li key={item}>
+                      <a href="#" className="text-xs font-black uppercase tracking-[0.1em] text-white/60 hover:text-white transition-colors">{item}</a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-white/30 mb-8">Hours</h4>
+                <div className="space-y-4 text-[10px] font-black uppercase tracking-[0.1em] text-white/60">
+                  <p>Daily <span className="text-white ml-2 italic tracking-widest">11:00 — 22:00</span></p>
+                  <p>Weekend <span className="text-white ml-2 italic tracking-widest">10:00 — 23:00</span></p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Social Links */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 mb-12">
-            <p className="text-slate-500 text-sm">Follow us on social media</p>
-            <div className="flex gap-3">
-              {[
-                {
-                  icon: Instagram,
-                  label: 'Instagram',
-                  color: 'hover:bg-pink-500'
-                },
-                {
-                  icon: Facebook,
-                  label: 'Facebook',
-                  color: 'hover:bg-blue-600'
-                },
-                {
-                  icon: Twitter,
-                  label: 'Twitter',
-                  color: 'hover:bg-sky-500'
-                }].
-                map((social, i) =>
-                  <a
-                    key={i}
-                    href="#"
-                    className={`group flex items-center gap-2 px-4 py-2 bg-slate-800 rounded-full ${social.color} transition-all duration-300`}>
-
-                    <social.icon className="w-4 h-4" />
-                    <span className="text-sm font-medium hidden sm:inline">
-                      {social.label}
-                    </span>
-                  </a>
-                )}
-            </div>
-          </div>
-
-          {/* Bottom Bar */}
-          <div className="border-t border-slate-800 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <p className="text-slate-500 text-sm">
-              &copy; {new Date().getFullYear()} La Maison Restaurant. All rights
-              reserved.
+          <div className="border-t border-white/5 pt-12 flex flex-col sm:flex-row items-center justify-between gap-6 opacity-30 hover:opacity-100 transition-opacity">
+            <p className="text-[10px] font-black uppercase tracking-[0.4em]">
+              &copy; {new Date().getFullYear()} SUNFLOWER — ARCHITECTED BY AI
             </p>
-            <div className="flex items-center gap-6">
-              {['Privacy', 'Terms', 'Cookies'].map((item) =>
-                <a
-                  key={item}
-                  href="#"
-                  className="text-slate-500 hover:text-orange-400 text-sm transition-colors">
-
-                  {item}
-                </a>
-              )}
-              <button
-                onClick={() =>
-                  window.scrollTo({
-                    top: 0,
-                    behavior: 'smooth'
-                  })
-                }
-                className="ml-2 w-10 h-10 bg-slate-800 hover:bg-orange-500 rounded-full flex items-center justify-center transition-all group">
-
-                <ArrowRight className="w-4 h-4 -rotate-90 group-hover:scale-110 transition-transform" />
-              </button>
+            <div className="flex gap-8 text-[10px] font-black uppercase tracking-[0.4em]">
+              <a href="#" className="hover:text-white">Privacy</a>
+              <a href="#" className="hover:text-white">Terms</a>
             </div>
           </div>
         </div>

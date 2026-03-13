@@ -8,8 +8,8 @@ import {
   Grid3x3,
   CalendarDays,
   LogOut,
-  ChefHat,
-  User
+  User,
+  Home
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -79,11 +79,6 @@ export function Sidebar({
     return true;
   });
 
-  const sidebarClasses = `
-    fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 text-white transform transition-transform duration-200 ease-in-out
-    ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'}
-    md:relative md:translate-x-0
-  `;
 
   const handleLogout = () => {
     dispatch(logout());
@@ -101,16 +96,20 @@ export function Sidebar({
       )}
 
       {/* Sidebar */}
-      <aside className={sidebarClasses}>
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 bg-white text-slate-900 transform transition-transform duration-200 ease-in-out border-r border-kona-teal/10 ${isMobileOpen ? 'translate-x-0' : '-translate-x-full'} md:relative md:translate-x-0 shadow-2xl`}>
         <div className="flex flex-col h-full">
           {/* Logo */}
-          <div className="p-6 flex items-center gap-3 border-b border-slate-800">
-            <div className="p-2 bg-orange-500 rounded-lg">
-              <ChefHat className="w-6 h-6 text-white" />
+          <div className="p-6 flex items-center gap-3 border-b border-kona-teal/5">
+            <div className="relative w-10 h-10">
+              <img 
+                src="https://images.unsplash.com/photo-1597843798133-e157ad0563f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                alt="Sunflower Logo" 
+                className="w-full h-full object-cover rounded-full border border-kona-teal shadow-md"
+              />
             </div>
             <div>
-              <h1 className="text-xl font-bold text-white">RestoManager</h1>
-              <p className="text-xs text-slate-400">{user?.role === 'admin' ? 'Admin Portal' : 'User Portal'}</p>
+              <h1 className="text-xl font-black text-kona-maroon tracking-tighter">SUNFLOWER</h1>
+              <p className="text-[10px] text-kona-teal font-black uppercase tracking-widest">{user?.role === 'admin' ? 'Manager Portal' : 'Guest Portal'}</p>
             </div>
           </div>
 
@@ -124,25 +123,33 @@ export function Sidebar({
                   to={item.path}
                   onClick={() => setIsMobileOpen(false)}
                   className={({ isActive }) => `
-                    w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-colors
-                    ${isActive ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white'}
+                    w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-black text-xs uppercase tracking-widest
+                    ${isActive ? 'bg-kona-teal text-white shadow-xl shadow-kona-teal/30 scale-[1.02]' : 'text-slate-400 hover:bg-kona-light hover:text-kona-teal'}
                   `}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon className="w-4 h-4" />
+                  <span>{item.label}</span>
                 </NavLink>
               );
             })}
           </nav>
 
-          {/* User Profile / Logout */}
-          <div className="p-4 border-t border-slate-800">
+          {/* Navigation Links */}
+          <div className="p-4 border-t border-kona-teal/5 space-y-2">
+            <button
+              onClick={() => navigate('/')}
+              className="w-full flex items-center gap-3 px-4 py-3 text-slate-500 hover:text-kona-teal hover:bg-kona-light rounded-xl transition-all font-black text-xs uppercase tracking-widest border border-transparent hover:border-kona-teal/10"
+            >
+              <Home className="w-4 h-4" />
+              <span>Back to Home</span>
+            </button>
+            
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+              className="w-full flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-kona-maroon rounded-xl transition-all font-black text-xs uppercase tracking-widest"
             >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Sign Out</span>
+              <LogOut className="w-4 h-4" />
+              <span>Sign Out</span>
             </button>
           </div>
         </div>

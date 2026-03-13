@@ -73,47 +73,66 @@ export function Profile() {
 
       Toast.fire({
         icon: 'success',
-        title: 'Profile updated successfully!'
+        title: 'Success!',
+        text: 'Your profile has been updated.'
       });
       setIsEditing(false);
       refetch();
     } catch (err: any) {
-      let errorMessage = 'Failed to update profile.';
-      
-      // Handle the specific validation error format from the backend
-      // Handle the specific validation error format from the backend (Zod-like error array)
-      const data = err?.data;
-      if (Array.isArray(data)) {
-        errorMessage = data.map((e: any) => {
-          // Improve phone number error message
-          if (e.path?.includes('phone') && e.code === 'invalid_format') {
-            return 'Mobile number must be 11 digits (e.g., 017XXXXXXXX)';
+      const getFriendlyMessage = (errorObj: any) => {
+        const data = errorObj?.data;
+        
+        const formatError = (e: any) => {
+          const field = e.path?.[e.path.length - 1] || '';
+          const message = e.message || '';
+          
+          if (field === 'phone') {
+            return 'Mobile Number: Must be exactly 11 digits starting with 01.';
           }
-          return e.message;
-        }).join('. ');
-      } else if (typeof data === 'string') {
+          if (field === 'name') {
+            if (e.code === 'too_small') return 'Name: Please enter your full name (min 2 characters).';
+          }
+          if (field === 'address') {
+            if (e.code === 'too_small') return 'Address: Please provide a detailed delivery address.';
+          }
+          
+          // Technical error fallback
+          if (message.includes('Cast to ObjectId')) {
+            return 'System Error: We encountered an issue updating your account. Our team is looking into it.';
+          }
+
+          return `${field.charAt(0).toUpperCase() + field.slice(1)}: ${message.replace(/Invalid string: must match pattern .*/, 'format is incorrect.')}`;
+        };
+
+        if (Array.isArray(data)) {
+          return data.map(formatError).join('\n');
+        }
+
+        if (typeof data === 'string') {
           try {
-              const parsed = JSON.parse(data);
-              if (Array.isArray(parsed)) {
-                  errorMessage = parsed.map((e: any) => {
-                    if (e.path?.includes('phone') && e.code === 'invalid_format') {
-                      return 'Mobile number must be 11 digits (e.g., 017XXXXXXXX)';
-                    }
-                    return e.message;
-                  }).join('. ');
-              }
-          } catch(e) {
-              errorMessage = data;
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) return parsed.map(formatError).join('\n');
+          } catch {
+            return data;
           }
-      } else if (err?.data?.message) {
-        errorMessage = err.data.message;
-      }
+        }
+
+        return errorObj?.data?.message || 'We could not update your profile right now. Please check your internet and try again.';
+      };
 
       Swal.fire({
-        title: 'Form Error',
-        text: errorMessage,
-        icon: 'error',
-        confirmButtonColor: '#f97316'
+        title: 'Heads Up!',
+        text: getFriendlyMessage(err),
+        icon: 'warning',
+        confirmButtonColor: '#f97316',
+        confirmButtonText: 'Fix Now',
+        background: '#fff',
+        customClass: {
+          popup: 'rounded-[1.5rem] shadow-2xl border border-slate-100',
+          confirmButton: 'rounded-xl px-10 py-4 font-black uppercase tracking-widest text-xs',
+          title: 'text-2xl font-black text-slate-900',
+          htmlContainer: 'text-slate-500 font-medium'
+        }
       });
     }
   };
