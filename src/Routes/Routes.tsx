@@ -2,6 +2,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 
 import { RestaurantFrontend } from '../pages/Frontend/RestaurantFrontend';
+import { Menu } from '../pages/Frontend/Menu';
 import { Login } from '../pages/Login/Login';
 import { Register } from '../pages/Register/Register';
 import { DashboardLayout } from '../Layout/DashboardLayout';
@@ -12,14 +13,30 @@ import { OrdersView } from '../pages/Dashboard/OrdersView/OrdersView';
 import { MenuView } from '../pages/Dashboard/MenuView/MenuView';
 import { TablesView } from '../pages/Dashboard/TablesView/TablesView';
 import { ReservationsView } from '../pages/Dashboard/ReservationsView/ReservationsView';
+import { Profile } from '../pages/Dashboard/UserHome/Profile';
 
 import { PrivateRoute } from './PrivateRoute';
 import { AdminRoute } from './AdminRoute';
+import { useSelector } from 'react-redux';
+import { useCurrentUser } from '../redux/features/auth/authSlice';
+import { Navigate } from 'react-router-dom';
+
+const DashboardIndex = () => {
+  const user = useSelector(useCurrentUser);
+  if (user?.role === 'admin') {
+    return <Navigate to="/dashboard/admin" replace />;
+  }
+  return <Navigate to="/dashboard/user" replace />;
+};
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <RestaurantFrontend />,
+  },
+  {
+    path: "/menu",
+    element: <Menu />,
   },
   {
     path: "/login",
@@ -34,6 +51,10 @@ export const router = createBrowserRouter([
     element: <PrivateRoute><DashboardLayout /></PrivateRoute>,
     children: [
       {
+        index: true,
+        element: <DashboardIndex />
+      },
+      {
         path: "user",
         element: <UserHome />
       },
@@ -47,7 +68,7 @@ export const router = createBrowserRouter([
       },
       {
         path: "menu",
-        element: <MenuView />
+        element: <AdminRoute><MenuView /></AdminRoute>
       },
       {
         path: "tables",
@@ -56,6 +77,10 @@ export const router = createBrowserRouter([
       {
         path: "reservations",
         element: <ReservationsView />
+      },
+      {
+        path: "profile",
+        element: <Profile />
       }
     ]
   }

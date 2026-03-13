@@ -8,7 +8,8 @@ import {
   Grid3x3,
   CalendarDays,
   LogOut,
-  ChefHat
+  ChefHat,
+  User
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -34,6 +35,13 @@ export function Sidebar({
       icon: LayoutDashboard
     },
     {
+      id: 'profile',
+      path: '/dashboard/profile',
+      label: 'My Profile',
+      icon: User,
+      userOnly: true
+    },
+    {
       id: 'orders',
       path: '/dashboard/orders',
       label: user?.role === 'admin' ? 'Order Management' : 'My Orders',
@@ -42,8 +50,9 @@ export function Sidebar({
     {
       id: 'menu',
       path: '/dashboard/menu',
-      label: user?.role === 'admin' ? 'Menu Management' : 'Our Menu',
-      icon: UtensilsCrossed
+      label: 'Menu Management',
+      icon: UtensilsCrossed,
+      adminOnly: true
     },
     {
       id: 'tables',
@@ -63,6 +72,9 @@ export function Sidebar({
   const filteredNavItems = navItems.filter(item => {
     if ('adminOnly' in item && item.adminOnly && user?.role !== 'admin') {
       return false;
+    }
+    if ('userOnly' in (item as any) && (item as any).userOnly && user?.role === 'admin') {
+        return false;
     }
     return true;
   });

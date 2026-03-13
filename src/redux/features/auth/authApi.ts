@@ -16,7 +16,22 @@ export const authApi = apiSlice.injectEndpoints({
                 data: userInfo,
             }),
         }),
+        getMe: builder.query({
+            query: () => ({
+                url: '/user/me',
+                method: 'GET',
+            }),
+            providesTags: ['User'],
+        }),
+        updateProfile: builder.mutation({
+            query: (data) => ({
+                url: '/user/me',
+                method: 'PATCH',
+                data,
+            }),
+            invalidatesTags: ['User'],
+        }),
     }),
 });
 
-export const { useLoginMutation, useRegisterMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useGetMeQuery, useUpdateProfileMutation } = authApi;
