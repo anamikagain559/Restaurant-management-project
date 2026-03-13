@@ -3,6 +3,8 @@ import { createBrowserRouter } from 'react-router-dom';
 
 import { RestaurantFrontend } from '../pages/Frontend/RestaurantFrontend';
 import { Menu } from '../pages/Frontend/Menu';
+import { Events } from '../pages/Frontend/Events';
+import { Contact } from '../pages/Frontend/Contact';
 import { Login } from '../pages/Login/Login';
 import { Register } from '../pages/Register/Register';
 import { DashboardLayout } from '../Layout/DashboardLayout';
@@ -37,6 +39,14 @@ export const router = createBrowserRouter([
   {
     path: "/menu",
     element: <Menu />,
+  },
+  {
+    path: "/events",
+    element: <Events />,
+  },
+  {
+    path: "/contact",
+    element: <Contact />,
   },
   {
     path: "/login",

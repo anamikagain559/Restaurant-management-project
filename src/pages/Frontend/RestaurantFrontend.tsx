@@ -316,13 +316,13 @@ export function RestaurantFrontend() {
       menuItems :
       menuItems.filter((item) => item.category === activeCategory);
 
-  const navItems = ['Home', 'About', 'Menu', 'Reservations', 'Contact'];
+  const navItems = ['Home', 'About', 'Menu', 'Events', 'Reservations', 'Contact'];
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
       {/* Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'glass-panel py-3 m-4 rounded-3xl' : 'bg-transparent py-6'}`}>
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-slate-900/50 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] py-3 m-4 rounded-3xl' : 'bg-transparent py-6'}`}>
 
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex justify-between items-center text-glow">
           <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigate('/')}>
@@ -344,11 +344,11 @@ export function RestaurantFrontend() {
           <div className="hidden md:flex items-center gap-10">
             {navItems.map(
               (item) =>
-                item === 'Menu' ? (
+                item === 'Menu' || item === 'Events' || item === 'Contact' ? (
                   <button
                     key={item}
-                    onClick={() => navigate('/menu')}
-                    className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all hover:scale-110"
+                    onClick={() => navigate(`/${item.toLowerCase()}`)}
+                    className="text-[10px] font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all hover:scale-110"
                   >
                     {item}
                   </button>
@@ -356,7 +356,7 @@ export function RestaurantFrontend() {
                   <button
                     key={item}
                     onClick={() => scrollToSection(item.toLowerCase())}
-                    className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all hover:scale-110">
+                    className="text-[10px] font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all hover:scale-110">
                     {item}
                   </button>
                 )
@@ -379,7 +379,7 @@ export function RestaurantFrontend() {
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all">
+                className="text-[10px] font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all">
                 Login
               </button>
             )}
@@ -401,11 +401,6 @@ export function RestaurantFrontend() {
               </span>
             </button>
 
-            <button
-              onClick={() => scrollToSection('reservations')}
-              className="bg-white text-kona-maroon hover:bg-kona-pink hover:text-white px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95">
-              Secure Table
-            </button>
           </div>
 
           {/* Mobile Menu Button - Styled for AI */}
@@ -426,10 +421,10 @@ export function RestaurantFrontend() {
           <div className="md:hidden absolute top-full left-0 right-0 bg-white shadow-lg border-t border-slate-100 p-4 flex flex-col gap-4">
             {navItems.map(
               (item) =>
-                item === 'Menu' ? (
+                item === 'Menu' || item === 'Events' || item === 'Contact' ? (
                   <button
                     key={item}
-                    onClick={() => navigate('/menu')}
+                    onClick={() => { navigate(`/${item.toLowerCase()}`); setIsMobileMenuOpen(false); }}
                     className="text-left text-slate-600 font-medium py-2 hover:text-orange-500"
                   >
                     {item}
@@ -437,7 +432,7 @@ export function RestaurantFrontend() {
                 ) : (
                   <button
                     key={item}
-                    onClick={() => scrollToSection(item.toLowerCase())}
+                    onClick={() => { scrollToSection(item.toLowerCase()); setIsMobileMenuOpen(false); }}
                     className="text-left text-slate-600 font-medium py-2 hover:text-orange-500">
                     {item}
                   </button>
@@ -491,13 +486,6 @@ export function RestaurantFrontend() {
                 )}
               </div>
             </button>
-
-            <button
-              onClick={() => scrollToSection('reservations')}
-              className="bg-orange-500 text-white py-3 rounded-lg font-medium text-center">
-
-              Reserve a Table
-            </button>
           </div>
         }
       </nav>
@@ -507,10 +495,15 @@ export function RestaurantFrontend() {
         id="home"
         className="relative min-h-[110vh] flex items-center justify-center overflow-hidden bg-slate-950">
 
-        {/* Advanced AI Mesh Background */}
-        <div className="absolute inset-0 bg-mesh opacity-40 z-0"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-slate-950/50 to-slate-950 z-0"></div>
-
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://i.ibb.co.com/dsJ59VbS/slider-bg2.webp" 
+            className="w-full h-full object-cover opacity-60" 
+            alt="Hero Background" 
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-slate-950 z-0"></div>
+        <div className="absolute inset-0 bg-mesh opacity-20 z-0 mix-blend-overlay"></div>
         {/* Animated Particle Field (Visualized as Orbs) */}
         {[...Array(6)].map((_, i) => (
           <div
@@ -528,17 +521,6 @@ export function RestaurantFrontend() {
           />
         ))}
 
-        {/* Floating AI Sunflower Centerpiece */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-4xl h-full flex items-center justify-center pointer-events-none z-0">
-          <div className="relative w-full h-full animate-float">
-            <img
-              src={logo}
-              alt="AI Sunflower Art"
-              className="w-full h-full object-contain opacity-40 mix-blend-screen mask-gradient"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent"></div>
-          </div>
-        </div>
 
         {/* Main Content */}
         <div className="relative z-20 text-center px-4 max-w-6xl mx-auto pt-20">

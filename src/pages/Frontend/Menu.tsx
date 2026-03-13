@@ -76,7 +76,7 @@ export function Menu() {
   const [createOrder, { isLoading: isOrdering }] = useCreateOrderMutation();
 
   const menuItems: MenuItem[] = menuData?.data || [];
-  const navItems = ['Home', 'About', 'Menu', 'Reservations', 'Contact'];
+  const navItems = ['Home', 'About', 'Menu', 'Events', 'Reservations', 'Contact'];
 
   useEffect(() => {
     if (user) {
@@ -234,7 +234,7 @@ export function Menu() {
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
       {/* Navbar */}
       <nav
-        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'glass-panel py-3 m-4 rounded-3xl' : 'bg-transparent py-6'}`}>
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? 'bg-slate-900/50 backdrop-blur-2xl border border-white/10 shadow-[0_8px_32px_rgba(0,0,0,0.2)] py-3 m-4 rounded-3xl' : 'bg-transparent py-6'}`}>
 
         <div className="max-w-7xl mx-auto px-6 sm:px-8 flex justify-between items-center text-glow">
           <div className="flex items-center gap-4 cursor-pointer group" onClick={() => navigate('/')}>
@@ -254,25 +254,21 @@ export function Menu() {
 
           {/* Desktop Nav */}
           <div className="hidden md:flex items-center gap-10">
-            {navItems.map(
-              (item) =>
-                item === 'Menu' ? (
-                  <button
-                    key={item}
-                    onClick={() => scrollToSection(item.toLowerCase())}
-                    className="text-xs font-black uppercase tracking-[0.3em] text-white border-b-2 border-white pb-1"
-                  >
-                    {item}
-                  </button>
-                ) : (
-                  <button
-                    key={item}
-                    onClick={() => scrollToSection(item.toLowerCase())}
-                    className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all hover:scale-110">
-                    {item}
-                  </button>
-                )
-            )}
+            {navItems.map((item) => (
+              <button
+                key={item}
+                onClick={() => {
+                  if (item === 'Home') navigate('/');
+                  else if (item === 'Menu') navigate('/menu');
+                  else if (item === 'Events') navigate('/events');
+                  else if (item === 'Contact') navigate('/contact');
+                  else navigate('/');
+                }}
+                className={`text-[10px] font-black uppercase tracking-[0.3em] transition-all hover:scale-110 ${item === 'Menu' ? 'text-white border-b-2 border-white pb-1' : 'text-white/90 hover:text-white'}`}
+              >
+                {item}
+              </button>
+            ))}
 
             {user ? (
               <div className="flex items-center gap-4 border-l border-white/20 pl-4">
@@ -291,7 +287,7 @@ export function Menu() {
             ) : (
               <button
                 onClick={() => navigate('/login')}
-                className="text-xs font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all">
+                className="text-[10px] font-black uppercase tracking-[0.3em] text-white/90 hover:text-white transition-all">
                 Login
               </button>
             )}
@@ -313,11 +309,6 @@ export function Menu() {
               </span>
             </button>
 
-            <button
-              onClick={() => scrollToSection('reservations')}
-              className="bg-white text-kona-maroon hover:bg-kona-pink hover:text-white px-8 py-3.5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] transition-all shadow-[0_0_30px_rgba(255,255,255,0.2)] hover:scale-105 active:scale-95">
-              Secure Table
-            </button>
           </div>
 
           {/* Mobile Menu Button - Styled for AI */}
@@ -369,19 +360,21 @@ export function Menu() {
               </button>
             )}
 
-            <button
-              onClick={() => scrollToSection('reservations')}
-              className="bg-orange-500 text-white py-3 rounded-lg font-medium text-center">
-              Reserve a Table
-            </button>
           </div>
         }
       </nav>
 
       {/* Hero Section - AI Premium */}
       <section className="relative pt-64 pb-32 overflow-hidden bg-slate-950">
-        <div className="absolute inset-0 bg-mesh opacity-30 z-0"></div>
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-slate-950 z-0"></div>
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://i.ibb.co.com/dsJ59VbS/slider-bg2.webp" 
+            className="w-full h-full object-cover opacity-60" 
+            alt="Hero Background" 
+          />
+        </div>
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/80 via-transparent to-slate-950 z-0"></div>
+        <div className="absolute inset-0 bg-mesh opacity-20 z-0 mix-blend-overlay"></div>
         
         <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
           <div className="inline-flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-2xl text-white/60 text-[10px] font-black uppercase tracking-[0.5em] mb-12 animate-shimmer overflow-hidden">
@@ -405,15 +398,15 @@ export function Menu() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 -mt-10 relative z-20 pb-32">
         {/* Search and Filters */}
-        <div className="glass-panel p-6 rounded-[3rem] shadow-glow-teal border border-white/10 flex flex-col lg:flex-row items-center gap-8 mb-20 relative overflow-hidden group">
-          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-kona-teal/30 to-transparent"></div>
+        <div className="bg-white p-6 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 flex flex-col lg:flex-row items-center gap-8 mb-20 relative overflow-hidden group">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-kona-teal/50 to-transparent"></div>
           
           <div className="flex-1 w-full lg:w-auto relative">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-white/20 group-focus-within:text-kona-teal transition-colors" />
+            <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-kona-teal transition-colors" />
             <input 
               type="text" 
               placeholder="Search Biological Selection..."
-              className="w-full pl-14 pr-6 py-5 bg-white/5 rounded-2xl border border-white/5 focus:border-kona-teal/50 focus:ring-4 focus:ring-kona-teal/5 outline-none transition-all font-medium text-white placeholder:text-white/20 text-sm"
+              className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-2xl border border-slate-100 focus:border-kona-teal/50 focus:ring-4 focus:ring-kona-teal/10 outline-none transition-all font-medium text-slate-800 placeholder:text-slate-400 text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -428,8 +421,8 @@ export function Menu() {
                   className={`
                     px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] whitespace-nowrap transition-all duration-500
                     ${activeCategory === category 
-                      ? 'bg-white text-slate-950 shadow-glow scale-105' 
-                      : 'text-white/40 hover:text-white bg-white/5 hover:bg-white/10 border border-white/5'
+                      ? 'bg-slate-950 text-white shadow-xl scale-105' 
+                      : 'text-slate-500 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
                     }
                   `}
                 >
@@ -454,57 +447,58 @@ export function Menu() {
             {filteredItems.map((item, idx) => (
               <div 
                 key={item._id}
-                className="glass-card group overflow-hidden rounded-[3rem] hover:bg-white/5 transition-all duration-700 border border-white/10 hover:border-white/30 shadow-2xl relative"
+                className="bg-white group overflow-hidden rounded-[3rem] hover:bg-slate-50 transition-all duration-700 border border-slate-100 hover:border-slate-200 shadow-[0_20px_50px_rgba(0,0,0,0.05)] hover:shadow-[0_30px_60px_rgba(0,0,0,0.1)] relative flex flex-col"
                 style={{ animationDelay: `${idx * 50}ms` }}
               >
-                <div className="h-64 relative overflow-hidden">
-                  {item.image ? (
-                    <img 
-                      src={item.image} 
-                      alt={item.name}
-                      className="w-full h-full object-cover grayscale-[0.5] group-hover:grayscale-0 group-hover:scale-110 transition-transform duration-1000"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
-                      }}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full bg-mesh opacity-20">
-                       <UtensilsCrossed className="w-12 h-12 text-white/20" />
+                <div className="h-64 relative overflow-hidden p-4">
+                  <div className="w-full h-full rounded-[2.5rem] overflow-hidden relative shadow-inner">
+                    {item.image ? (
+                      <img 
+                        src={item.image} 
+                        alt={item.name}
+                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
+                        }}
+                      />
+                    ) : (
+                      <div className="flex items-center justify-center h-full bg-slate-100">
+                         <UtensilsCrossed className="w-12 h-12 text-slate-300" />
+                      </div>
+                    )}
+                    
+                    <div className="absolute top-4 left-4">
+                      <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md text-slate-800 text-[8px] font-black tracking-[0.32em] uppercase rounded-full shadow-lg border border-slate-200">
+                        {item.category}
+                      </span>
                     </div>
-                  )}
-                  
-                  <div className="absolute top-6 left-6">
-                    <span className="px-5 py-2 bg-slate-950/80 backdrop-blur-md text-white/60 text-[8px] font-black tracking-[0.32em] uppercase rounded-full shadow-2xl border border-white/10">
-                      {item.category}
-                    </span>
-                  </div>
 
-                  {!item.isAvailable && (
-                    <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center z-10">
-                      <span className="px-8 py-3 bg-white text-slate-950 text-[10px] font-black uppercase tracking-[0.4em] rounded-full shadow-glow">Depleted</span>
-                    </div>
-                  )}
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60"></div>
+                    {!item.isAvailable && (
+                      <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-10">
+                        <span className="px-8 py-3 bg-rose-500 text-white text-[10px] font-black uppercase tracking-[0.4em] rounded-full shadow-xl">Depleted</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="p-8">
-                  <div className="flex justify-between items-start mb-6">
-                    <h3 className="text-xl font-black text-white group-hover:text-kona-teal transition-colors line-clamp-1 pr-2 uppercase tracking-tighter text-glow">
+                <div className="p-8 pt-4 flex-1 flex flex-col">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-xl font-black text-slate-900 group-hover:text-kona-teal transition-colors line-clamp-1 pr-2 uppercase tracking-tighter">
                       {item.name}
                     </h3>
                   </div>
-                  <p className="text-xs text-white/30 line-clamp-2 leading-relaxed mb-10 h-10 font-light italic">
+                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-8 h-10 font-light italic flex-1">
                     {item.description}
                   </p>
                   
-                  <div className="flex items-center justify-between pt-8 border-t border-white/5">
-                    <span className="text-xl font-black text-white/80">
+                  <div className="flex items-center justify-between pt-6 border-t border-slate-100 mt-auto">
+                    <span className="text-2xl font-black text-slate-900">
                       ${item.price.toFixed(2)}
                     </span>
                     <button
                       onClick={() => addToCart(item)}
                       disabled={!item.isAvailable}
-                      className="w-12 h-12 rounded-full glass-card flex items-center justify-center text-white hover:bg-white hover:text-slate-950 hover:scale-110 active:scale-95 transition-all shadow-glow disabled:opacity-50 disabled:cursor-not-allowed group/btn"
+                      className="w-12 h-12 rounded-full bg-slate-900 flex items-center justify-center text-white hover:bg-kona-teal hover:scale-110 active:scale-95 transition-all shadow-xl disabled:opacity-50 disabled:cursor-not-allowed group/btn"
                     >
                       <Plus className="w-5 h-5 group-hover/btn:rotate-90 transition-transform" />
                     </button>
@@ -515,11 +509,11 @@ export function Menu() {
           </div>
         ) : (
           <div className="text-center py-40">
-             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-8">
-                <Filter className="w-10 h-10 text-slate-200" />
+             <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-8 border border-slate-200 shadow-sm">
+                <Filter className="w-10 h-10 text-slate-400" />
              </div>
              <h3 className="text-2xl font-black text-slate-900 mb-2">No delicacies found</h3>
-             <p className="text-slate-400 font-medium">Try adjusting your search or filters to find what you're looking for.</p>
+             <p className="text-slate-500 font-light italic">Try adjusting your search or filters to find what you're looking for.</p>
           </div>
         )}
       </main>
@@ -739,7 +733,16 @@ export function Menu() {
                 <ul className="space-y-4">
                   {navItems.map(item => (
                     <li key={item}>
-                      <button onClick={() => scrollToSection(item.toLowerCase())} className="text-white/40 hover:text-white text-xs font-medium transition-all hover:translate-x-2 flex items-center gap-2 group">
+                      <button 
+                        onClick={() => {
+                          if (item === 'Home') navigate('/');
+                          else if (item === 'Menu') navigate('/menu');
+                          else if (item === 'Events') navigate('/events');
+                          else if (item === 'Contact') navigate('/contact');
+                          else scrollToSection(item.toLowerCase()); // Fallback to existing scroll behavior for other items
+                        }}
+                        className="text-white/40 hover:text-white text-xs font-medium transition-all hover:translate-x-2 flex items-center gap-2 group"
+                      >
                         <span className="w-0 h-px bg-kona-teal group-hover:w-4 transition-all"></span>
                         {item}
                       </button>
