@@ -30,34 +30,33 @@ export const FrontendFooter: React.FC<FooterProps> = ({ navItems, scrollToSectio
       <div className="max-w-7xl mx-auto px-6 lg:px-8 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 mb-32">
           <div>
-            <div className="flex flex-col gap-6 mb-12">
-              <div 
-                className="w-24 h-24 glass-card rounded-[2rem] p-4 border border-white/20 flex items-center justify-center relative group cursor-pointer overflow-hidden shadow-2xl"
+            <div className="flex flex-row items-center gap-6 mb-12">
+              <div
+                className="w-20 h-20 glass-card rounded-full p-1 border border-white/20 flex items-center justify-center relative group cursor-pointer overflow-hidden shadow-2xl"
                 onClick={() => navigate('/')}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-kona-teal/20 via-transparent to-kona-maroon/20 opacity-50 group-hover:scale-110 transition-transform duration-700"></div>
-                <img 
-                  src={logo} 
-                  alt="Logo" 
-                  className="w-full h-full object-contain relative z-10 group-hover:scale-110 transition-transform duration-700" 
+                <img
+                  src={logo}
+                  alt="Logo"
+                  className="w-full h-full object-cover rounded-full relative z-10 group-hover:scale-110 transition-transform duration-700"
                 />
               </div>
               <div>
-                <h3 className="text-5xl font-black tracking-tighter text-glow uppercase mb-2">SUNFLOWER</h3>
+                <h3 className="text-4xl font-black tracking-tighter text-glow uppercase mb-1">SUNFLOWER</h3>
                 <div className="flex items-center gap-3">
-                  <span className="h-px w-8 bg-kona-teal"></span>
-                  <span className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40">Premium Collective</span>
+                  <span className="h-px w-6 bg-kona-teal"></span>
+                  <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40">Premium Collective</span>
                 </div>
               </div>
             </div>
             <p className="text-white/30 text-lg font-light leading-relaxed max-w-md italic mb-12">
-              Merging biological aesthetics with technological precision. 
+              Merging biological aesthetics with technological precision.
               Experience the next iteration of culinary excellence.
             </p>
             <div className="flex gap-4">
               {[Instagram, Facebook, Twitter].map((Icon, i) => (
-                <button 
-                  key={i} 
+                <button
+                  key={i}
                   className="w-12 h-12 glass-card rounded-full flex items-center justify-center text-white/40 hover:text-white hover:border-white/40 transition-all hover:scale-110"
                 >
                   <Icon className="w-5 h-5" />
@@ -65,14 +64,14 @@ export const FrontendFooter: React.FC<FooterProps> = ({ navItems, scrollToSectio
               ))}
             </div>
           </div>
-          
+
           <div className="grid grid-cols-2 gap-10">
             <div>
               <h4 className="text-[10px] font-black uppercase tracking-[0.4em] text-kona-teal mb-8">Navigation</h4>
               <ul className="space-y-4">
                 {navItems.map(item => (
                   <li key={item}>
-                    <button 
+                    <button
                       onClick={() => handleNavClick(item)}
                       className="text-white/40 hover:text-white text-xs font-medium transition-all hover:translate-x-2 flex items-center gap-2 group"
                     >
@@ -98,7 +97,7 @@ export const FrontendFooter: React.FC<FooterProps> = ({ navItems, scrollToSectio
             </div>
           </div>
         </div>
-        
+
         <div className="pt-16 border-t border-white/5 flex flex-col md:row items-center justify-between gap-8">
           <p className="text-white/10 text-[10px] font-black uppercase tracking-[0.3em]">
             © 2024 SUNFLOWER CORE SYSTEMS. ALL RIGHTS RESERVED.

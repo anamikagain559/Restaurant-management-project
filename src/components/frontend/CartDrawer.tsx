@@ -3,14 +3,14 @@ import { X, ShoppingBasket, UtensilsCrossed, Trash2, Minus, Plus, ArrowLeft, Use
 import { useGetAllMenuQuery } from '../../redux/features/menu/menuApi';
 import Swal from 'sweetalert2';
 import { useDispatch, useSelector } from 'react-redux';
-import { 
-  selectCartItems, 
-  selectCartTotal, 
-  removeFromCart, 
-  updateQuantity, 
-  clearCart, 
-  selectIsCartOpen, 
-  setCartOpen 
+import {
+  selectCartItems,
+  selectCartTotal,
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+  selectIsCartOpen,
+  setCartOpen
 } from '../../redux/features/cart/cartSlice';
 
 interface CartDrawerProps {
@@ -38,7 +38,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   const cart = useSelector(selectCartItems);
   const cartTotal = useSelector(selectCartTotal);
   const isOpen = useSelector(selectIsCartOpen);
-  
+
   const onClose = () => dispatch(setCartOpen(false));
 
   const [checkoutStep, setCheckoutStep] = useState<'CART' | 'ADDRESS'>('CART');
@@ -167,7 +167,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 <ShoppingBasket className="w-6 h-6 text-slate-700" />
               </div>
               <h2 className="text-2xl font-black text-slate-900 tracking-tighter uppercase">
-                {checkoutStep === 'CART' ? 'System Order' : 'Protocol'}
+                {checkoutStep === 'CART' ? 'All Carts' : 'Protocol'}
               </h2>
             </div>
             <button onClick={onClose} className="text-slate-400 hover:text-slate-900 transition-colors">
@@ -190,26 +190,20 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   </div>
                 ) : (
                   cart.map((i) => {
-                    const fullMenuItem = menuData?.find((m: any) => m._id === i.item._id || m.id === i.item._id);
-                    const itemImage = fullMenuItem?.image || i.item.image;
+                    const itemImage = i.item.image || '';
 
                     return (
                       <div key={i.item._id} className="flex gap-4 p-4 bg-white hover:bg-slate-50 transition-colors rounded-2xl border border-slate-100 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
                         <div className="w-20 h-20 bg-slate-50 rounded-xl flex items-center justify-center border border-slate-100 overflow-hidden relative">
                           {itemImage ? (
-                            <>
-                              <img 
-                                src={itemImage} 
-                                alt={i.item.name} 
-                                className="w-full h-full object-cover" 
-                                onError={(e) => {
-                                  (e.target as HTMLImageElement).style.display = 'none';
-                                  const nextEl = (e.target as HTMLImageElement).nextElementSibling as HTMLElement;
-                                  if (nextEl) nextEl.style.display = 'block';
-                                }}
-                              />
-                              <UtensilsCrossed className="w-8 h-8 text-slate-300 absolute" style={{ display: 'none' }} />
-                            </>
+                            <img
+                              src={itemImage}
+                              alt={i.item.name}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&q=80';
+                              }}
+                            />
                           ) : (
                             <UtensilsCrossed className="w-8 h-8 text-slate-300" />
                           )}
@@ -217,7 +211,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         <div className="flex-1">
                           <div className="flex justify-between mb-1">
                             <h4 className="font-black text-slate-900 uppercase text-xs tracking-wider">{i.item.name}</h4>
-                            <button onClick={() => handleRemove(i.item._id)} className="text-slate-400 hover:text-rose-500 transition-colors">
+                            <button onClick={() => handleRemove(i.item._id)} className="text-rose-500 hover:text-rose-600 transition-all active:scale-90 bg-rose-50 p-2 rounded-lg">
                               <Trash2 className="w-4 h-4" />
                             </button>
                           </div>

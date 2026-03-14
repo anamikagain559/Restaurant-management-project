@@ -24,7 +24,7 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
           <div className="max-w-xl">
             <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-4">
-              Curated Selection
+              Curated Cart
             </div>
             <h2 className="text-5xl md:text-7xl font-black text-kona-maroon tracking-tighter uppercase leading-[0.85]">
               Discovery <br /> <span className="text-kona-teal">Prototypes</span>
@@ -79,7 +79,7 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
                         <UtensilsCrossed className="w-12 h-12 text-slate-300 group-hover:scale-110 transition-transform duration-500" />
                       </div>
                     )}
-                    
+
                     {/* Glass Badge */}
                     <div className="absolute top-4 left-4 z-10">
                       <span className="px-4 py-1.5 bg-white/80 backdrop-blur-md text-kona-maroon text-[8px] font-black tracking-[0.3em] uppercase rounded-full shadow-lg border border-white/50">
@@ -108,18 +108,18 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
                     </h3>
                   </div>
 
-                  <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-8 h-10 font-light italic opacity-80 group-hover:opacity-100 transition-opacity">
+                  <p className="text-lg text-slate-500 line-clamp-2 leading-relaxed mb-8 h-12 md:h-16 font-light italic opacity-80 group-hover:opacity-100 transition-opacity">
                     {item.description}
                   </p>
 
                   <div className="mt-auto flex items-center justify-between pt-6 border-t border-slate-100/50">
                     <div className="flex flex-col">
-                      <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Price Unit</span>
+                      <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Price Unit</span>
                       <span className="text-2xl font-black text-slate-900">
                         ${item.price.toFixed(2)}
                       </span>
                     </div>
-                    
+
                     <button
                       onClick={() => addToCart(item)}
                       disabled={!item.isAvailable}

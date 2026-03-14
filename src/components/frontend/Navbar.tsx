@@ -49,35 +49,39 @@ export const FrontendNavbar: React.FC<NavbarProps> = ({
       isScrolled ? 'bg-slate-950/80 backdrop-blur-2xl py-4 shadow-2xl' : 'bg-transparent py-8'
     }`}>
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-        <div className="flex items-center gap-4 group cursor-pointer" onClick={() => navigate('/')}>
+        <div className="flex items-center gap-4 group cursor-pointer -ml-5" onClick={() => navigate('/')}>
           <div className="w-12 h-12 glass-card rounded-full p-1 border border-white/20 group-hover:border-kona-teal/50 transition-all">
             <img src={logo} alt="Logo" className="w-full h-full object-cover rounded-full" />
           </div>
-          <span className="text-2xl font-black tracking-tighter text-white text-glow">SUNFLOWER</span>
+          <span className="text-2xl font-black tracking-tighter text-white text-glow uppercase">SUNFLOWER</span>
         </div>
 
-        {/* Desktop Links */}
-        <div className="hidden lg:flex items-center gap-10">
-          {navItems.map(item => (
-            <button
-              key={item}
-              onClick={() => handleNavClick(item)}
-              className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-white transition-all hover:scale-110"
-            >
-              {item}
-            </button>
-          ))}
-          
-          <div className="h-4 w-px bg-white/10 mx-2"></div>
-          
+        {/* Desktop Navigation - Centered */}
+        <div className="hidden lg:flex flex-1 justify-center">
+          <div className="flex items-center gap-[35px]">
+            {navItems.map(item => (
+              <button
+                key={item}
+                onClick={() => handleNavClick(item)}
+                className="text-[10px] font-black uppercase tracking-[0.4em] text-white/40 hover:text-white transition-all hover:scale-110 relative group px-2"
+              >
+                {item}
+                <span className="absolute -bottom-1 left-0 w-0 h-px bg-kona-teal transition-all group-hover:w-full"></span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Actions - Right */}
+        <div className="hidden lg:flex items-center gap-6">
           {user ? (
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4">
               <button 
                 onClick={() => navigate('/dashboard')}
                 className="group flex items-center gap-3 bg-white/5 hover:bg-white text-white hover:text-slate-950 px-6 py-2.5 rounded-full border border-white/10 transition-all text-[10px] font-black uppercase tracking-widest"
               >
                 <LayoutDashboard className="w-4 h-4 opacity-40 group-hover:opacity-100" />
-                Terminal
+                Dashboard
               </button>
               <button 
                 onClick={handleLogout}
@@ -99,7 +103,7 @@ export const FrontendNavbar: React.FC<NavbarProps> = ({
           {setIsCartOpen && (
             <button
               onClick={() => setIsCartOpen(true)}
-              className="glass-card px-5 py-2.5 rounded-full flex items-center gap-3 hover:bg-white/10 transition-all relative group ml-2"
+              className="glass-card px-5 py-2.5 rounded-full flex items-center gap-3 hover:bg-white/10 transition-all relative group"
             >
               <div className="relative">
                 <ShoppingBasket className="w-4 h-4 text-white" />
@@ -109,7 +113,7 @@ export const FrontendNavbar: React.FC<NavbarProps> = ({
                   </span>
                 )}
               </div>
-              <span className="text-white font-black text-[9px] uppercase tracking-widest opacity-60 group-hover:opacity-100">Selection</span>
+              <span className="text-white font-black text-[9px] uppercase tracking-widest opacity-60 group-hover:opacity-100">Cart</span>
             </button>
           )}
         </div>
@@ -155,7 +159,7 @@ export const FrontendNavbar: React.FC<NavbarProps> = ({
             {user ? (
                <>
                  <button onClick={() => { setIsMobileMenuOpen(false); navigate('/dashboard'); }} className="text-white font-black uppercase tracking-widest flex items-center gap-3">
-                   <LayoutDashboard className="w-5 h-5 text-kona-teal" /> Terminal
+                   <LayoutDashboard className="w-5 h-5 text-kona-teal" /> Dashboard
                  </button>
                  <button onClick={handleLogout} className="text-rose-500 font-black uppercase tracking-widest flex items-center gap-3">
                    <LogOut className="w-5 h-5" /> Terminate Session

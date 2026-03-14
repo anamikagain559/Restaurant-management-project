@@ -44,7 +44,7 @@ export function Menu() {
           <div className="inline-flex items-center gap-4 px-6 py-2.5 rounded-full bg-white/5 border border-white/10 backdrop-blur-2xl text-white/60 text-[10px] font-black uppercase tracking-[0.5em] mb-12 animate-shimmer overflow-hidden">
              <span className="flex items-center gap-2">
                <span className="w-1.5 h-1.5 rounded-full bg-kona-teal animate-pulse"></span>
-               Biological Selection
+               Biological Cart
              </span>
           </div>
           <h1 className="text-6xl md:text-8xl font-black text-white mb-8 tracking-tighter uppercase leading-[0.85] text-glow">
@@ -69,7 +69,7 @@ export function Menu() {
             <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-300 group-focus-within:text-kona-teal transition-colors" />
             <input 
               type="text" 
-              placeholder="Search Biological Selection..."
+              placeholder="Search Biological Cart..."
               className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-2xl border border-slate-100 focus:border-kona-teal/50 focus:ring-4 focus:ring-kona-teal/10 outline-none transition-all font-medium text-slate-800 placeholder:text-slate-400 text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}

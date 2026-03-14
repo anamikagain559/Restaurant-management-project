@@ -1,3 +1,4 @@
+import logo from '../assets/logo.png';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, NavLink } from 'react-router-dom';
 import { logout, useCurrentUser } from '../redux/features/auth/authSlice';
@@ -100,11 +101,11 @@ export function Sidebar({
         <div className="flex flex-col h-full">
           {/* Logo */}
           <div className="p-6 flex items-center gap-3 border-b border-kona-teal/5">
-            <div className="relative w-10 h-10">
+            <div className="relative w-11 h-11 glass-card rounded-full p-1 border border-kona-teal/20 flex items-center justify-center">
               <img 
-                src="https://images.unsplash.com/photo-1597843798133-e157ad0563f1?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" 
+                src={logo} 
                 alt="Sunflower Logo" 
-                className="w-full h-full object-cover rounded-full border border-kona-teal shadow-md"
+                className="w-full h-full object-cover rounded-full shadow-md"
               />
             </div>
             <div>
