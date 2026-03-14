@@ -1,0 +1,10 @@
+src/index.tsx(2,1): error TS6133: 'React' is declared but its value is never read.
+src/pages/Dashboard/AdminHome/AdminHome.tsx(1,1): error TS6133: 'React' is declared but its value is never read.
+src/pages/Dashboard/AdminHome/AdminHome.tsx(8,3): error TS6133: 'Clock' is declared but its value is never read.
+src/pages/Dashboard/MenuView/MenuView.tsx(15,105): error TS6133: 'CheckCircle2' is declared but its value is never read.
+src/pages/Frontend/Menu.tsx(28,1): error TS6133: 'heroBg' is declared but its value is never read.
+src/pages/Frontend/RestaurantFrontend.tsx(23,3): error TS6133: 'ChefHat' is declared but its value is never read.
+src/pages/Frontend/RestaurantFrontend.tsx(30,3): error TS6133: 'ArrowRight' is declared but its value is never read.
+src/pages/Frontend/RestaurantFrontend.tsx(51,1): error TS6133: 'heroBg' is declared but its value is never read.
+src/pages/Frontend/RestaurantFrontend.tsx(846,78): error TS7006: Parameter 'm' implicitly has an 'any' type.
+src/pages/Frontend/RestaurantFrontend.tsx(846,136): error TS6133: 'itemImage' is declared but its value is never read.

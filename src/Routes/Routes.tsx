@@ -8,6 +8,7 @@ import { Contact } from '../pages/Frontend/Contact';
 import { Login } from '../pages/Login/Login';
 import { Register } from '../pages/Register/Register';
 import { DashboardLayout } from '../Layout/DashboardLayout';
+import { FrontendLayout } from '../Layout/FrontendLayout';
 
 import { AdminHome } from '../pages/Dashboard/AdminHome/AdminHome';
 import { UserHome } from '../pages/Dashboard/UserHome/UserHome';
@@ -34,19 +35,25 @@ const DashboardIndex = () => {
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <RestaurantFrontend />,
-  },
-  {
-    path: "/menu",
-    element: <Menu />,
-  },
-  {
-    path: "/events",
-    element: <Events />,
-  },
-  {
-    path: "/contact",
-    element: <Contact />,
+    element: <FrontendLayout />,
+    children: [
+      {
+        index: true,
+        element: <RestaurantFrontend />,
+      },
+      {
+        path: "menu",
+        element: <Menu />,
+      },
+      {
+        path: "events",
+        element: <Events />,
+      },
+      {
+        path: "contact",
+        element: <Contact />,
+      },
+    ]
   },
   {
     path: "/login",
