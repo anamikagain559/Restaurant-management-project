@@ -8,10 +8,12 @@ import {
     LogOut,
     ChefHat,
     ShoppingBag,
-    Heart,
     Settings,
-    Bell
+    Bell,
+    CalendarDays
 } from 'lucide-react';
+import { useGetMyReservationsQuery } from '../../../redux/features/reservation/reservationApi';
+import { useGetMyOrdersQuery } from '../../../redux/features/order/orderApi';
 
 export function UserHome() {
     const user = useSelector(useCurrentUser);
@@ -27,21 +29,46 @@ export function UserHome() {
         return null;
     }
 
+    const { data: reservationsData, isLoading: isReservationsLoading, error: resError } = useGetMyReservationsQuery(undefined);
+    const { data: ordersData, isLoading: isOrdersLoading, error: orderError } = useGetMyOrdersQuery(undefined);
+
+    const reservations = Array.isArray(reservationsData) ? reservationsData : (reservationsData?.data || []);
+    const orders = Array.isArray(ordersData) ? ordersData : (ordersData?.data || []);
+
+    if (resError || orderError) {
+        console.error('Dashboard Error:', resError || orderError);
+    }
+
     const activities = [
-        { id: 1, type: 'Order', detail: 'Signature Burger #ORD-224', date: 'Yesterday', icon: ShoppingBag, color: 'text-orange-500' },
-        { id: 2, type: 'Reservation', detail: 'Table for 2 - Friday 7:00 PM', date: '2 days ago', icon: ChefHat, color: 'text-blue-500' },
-        { id: 3, type: 'Favorite', detail: 'Added Grilled Salmon to favorites', date: '5 days ago', icon: Heart, color: 'text-red-500' },
-    ];
+        ...reservations.map((res: any) => ({
+            id: `res-${res._id}`,
+            type: 'Reservation',
+            detail: `Table for ${res.guests} - ${res.date} ${res.time}`,
+            date: res.status,
+            icon: CalendarDays,
+            color: 'text-blue-500',
+            rawDate: new Date(res.createdAt)
+        })),
+        ...orders.map((order: any) => ({
+            id: `ord-${order._id}`,
+            type: 'Order',
+            detail: `Order #${order._id.slice(-6).toUpperCase()} - $${order.totalAmount.toFixed(2)}`,
+            date: order.status,
+            icon: ShoppingBag,
+            color: 'text-orange-500',
+            rawDate: new Date(order.createdAt)
+        }))
+    ].sort((a, b) => b.rawDate.getTime() - a.rawDate.getTime()).slice(0, 5);
 
     return (
         <div className="min-h-screen bg-slate-50 flex flex-col">
             {/* Header */}
             <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-orange-500 rounded-lg">
+                    <div className="p-2 bg-kona-teal rounded-lg">
                         <ChefHat className="w-6 h-6 text-white" />
                     </div>
-                    <span className="text-xl font-bold text-slate-900 hidden sm:block">My Account</span>
+                    <span className="text-xl font-bold text-slate-900 hidden sm:block uppercase tracking-tighter">My Account</span>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -64,10 +91,10 @@ export function UserHome() {
                     {/* Profile Card */}
                     <div className="lg:col-span-1 space-y-6">
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-                            <div className="h-32 bg-gradient-to-r from-orange-400 to-orange-600 relative">
+                            <div className="h-32 bg-gradient-to-r from-kona-maroon to-kona-teal relative">
                                 <div className="absolute -bottom-10 left-6">
                                     <div className="w-20 h-20 rounded-2xl bg-white p-1 shadow-lg">
-                                        <div className="w-full h-full rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 text-3xl font-bold">
+                                        <div className="w-full h-full rounded-xl bg-kona-light flex items-center justify-center text-kona-teal text-3xl font-bold">
                                             {user.email[0].toUpperCase()}
                                         </div>
                                     </div>
@@ -83,7 +110,7 @@ export function UserHome() {
                                 </div>
                                 <div className="flex items-center gap-2 text-slate-500 text-sm mt-1">
                                     <Shield className="w-4 h-4" />
-                                    Role: <span className="text-orange-600 font-semibold">{user.role}</span>
+                                    Role: <span className="text-kona-teal font-semibold uppercase text-xs">{user.role}</span>
                                 </div>
 
                                 <div className="mt-8 space-y-3">
@@ -106,10 +133,10 @@ export function UserHome() {
                         </div>
 
                         <div className="bg-slate-900 rounded-2xl p-6 text-white overflow-hidden relative group">
-                            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-orange-500/20 rounded-full blur-3xl group-hover:bg-orange-500/30 transition-all"></div>
-                            <h3 className="text-lg font-bold mb-2 relative z-10">Premium Member</h3>
-                            <p className="text-slate-400 text-sm mb-4 relative z-10">You've unlocked exclusive rewards and early access to reservations.</p>
-                            <button className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-xs font-bold transition-all relative z-10">
+                            <div className="absolute -right-10 -bottom-10 w-40 h-40 bg-kona-teal/20 rounded-full blur-3xl group-hover:bg-kona-teal/30 transition-all"></div>
+                            <h3 className="text-lg font-bold mb-2 relative z-10 text-glow">Premium Member</h3>
+                            <p className="text-slate-400 text-sm mb-4 relative z-10 font-light italic">You've unlocked exclusive rewards and early access to reservations.</p>
+                            <button className="px-4 py-2 bg-kona-teal hover:bg-white hover:text-kona-teal text-white rounded-lg text-xs font-black uppercase tracking-widest transition-all relative z-10">
                                 View Rewards
                             </button>
                         </div>
@@ -135,27 +162,40 @@ export function UserHome() {
                                     </div>
                                 ))}
                             </div>
-                            <button className="w-full mt-6 py-3 text-sm font-bold text-orange-600 hover:bg-orange-50 rounded-xl transition-colors">
+                            <button 
+                                onClick={() => navigate('/dashboard/orders')}
+                                className="w-full mt-6 py-3 text-[10px] font-black uppercase tracking-widest text-kona-teal hover:bg-kona-light rounded-xl transition-colors border border-transparent hover:border-kona-teal/10"
+                            >
                                 View All Activity
                             </button>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="bg-orange-50 border border-orange-100 rounded-2xl p-6 flex items-center gap-4">
+                            <div 
+                                onClick={() => navigate('/dashboard/orders')}
+                                className="bg-orange-50 border border-orange-100 rounded-2xl p-6 flex items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all"
+                            >
                                 <div className="bg-white p-3 rounded-xl shadow-sm text-orange-500">
                                     <ShoppingBag className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-slate-900">12</div>
+                                    <div className="text-2xl font-bold text-slate-900">
+                                        {isOrdersLoading ? '...' : orders.length}
+                                    </div>
                                     <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Total Orders</div>
                                 </div>
                             </div>
-                            <div className="bg-blue-50 border border-blue-100 rounded-2xl p-6 flex items-center gap-4">
+                            <div 
+                                onClick={() => navigate('/dashboard/reservations')}
+                                className="bg-blue-50 border border-blue-100 rounded-2xl p-6 flex items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all"
+                            >
                                 <div className="bg-white p-3 rounded-xl shadow-sm text-blue-500">
-                                    <ChefHat className="w-6 h-6" />
+                                    <CalendarDays className="w-6 h-6" />
                                 </div>
                                 <div>
-                                    <div className="text-2xl font-bold text-slate-900">4</div>
+                                    <div className="text-2xl font-bold text-slate-900">
+                                        {isReservationsLoading ? '...' : reservations.length}
+                                    </div>
                                     <div className="text-xs text-slate-500 font-medium uppercase tracking-wider">Reservations</div>
                                 </div>
                             </div>

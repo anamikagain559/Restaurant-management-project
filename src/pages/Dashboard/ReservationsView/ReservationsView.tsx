@@ -34,7 +34,7 @@ export function ReservationsView() {
 
   const isLoading = isAdmin ? adminLoading : userLoading;
   const reservationData = isAdmin ? adminReservations : userReservations;
-  const reservations: Reservation[] = reservationData?.data || [];
+  const reservations: Reservation[] = Array.isArray(reservationData) ? reservationData : (reservationData?.data || []);
 
   const handleStatusUpdate = async (id: string, status: ReservationStatus) => {
     if (!isAdmin) return;

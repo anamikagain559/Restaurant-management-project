@@ -17,7 +17,8 @@ export const axiosBaseQuery =
         unknown,
         unknown
     > =>
-        async ({ url, method, data, params, headers }) => {
+        async ({ url, method, data, params, headers }, { getState }) => {
+            const token = (getState() as any).auth.token;
             try {
                 const result = await axios({
                     url: baseUrl + url,
@@ -26,6 +27,7 @@ export const axiosBaseQuery =
                     params,
                     headers: {
                         'Content-Type': 'application/json',
+                        ...(token ? { Authorization: token.startsWith('Bearer ') ? token : `Bearer ${token}` } : {}),
                         ...headers,
                     },
                 })

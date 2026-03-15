@@ -98,6 +98,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
     try {
       await createOrder({
+        user: user?._id || user?.userId,
         email: user?.email,
         items: cart.map(i => ({
           menuItem: i.item._id,

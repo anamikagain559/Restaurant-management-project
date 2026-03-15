@@ -29,15 +29,19 @@ export function OrdersView() {
   const { data: adminOrders, isLoading: adminLoading } = useGetAllOrdersQuery(undefined, {
     skip: !isAdmin
   });
-  const { data: userOrders, isLoading: userLoading } = useGetMyOrdersQuery(undefined, {
+  const { data: userOrders, isLoading: userLoading, error: userError } = useGetMyOrdersQuery(undefined, {
     skip: isAdmin
   });
 
   const [updateStatus] = useUpdateOrderStatusMutation();
 
+  if (userError) {
+    console.error('OrdersView Error:', userError);
+  }
+
   const isLoading = isAdmin ? adminLoading : userLoading;
   const orderData = isAdmin ? adminOrders : userOrders;
-  const orders: Order[] = orderData?.data || [];
+  const orders: Order[] = Array.isArray(orderData) ? orderData : (orderData?.data || []);
 
   const handleStatusUpdate = async (id: string, currentStatus: OrderStatus) => {
     if (!isAdmin) return;

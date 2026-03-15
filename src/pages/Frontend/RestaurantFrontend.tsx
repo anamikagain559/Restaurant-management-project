@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -50,6 +50,17 @@ export function RestaurantFrontend() {
   const { data: menuData, isLoading: isMenuLoading } = useGetAllMenuQuery(undefined);
   const [createReservation, { isLoading: isReserving }] = useCreateReservationMutation();
 
+  // Auto-populate user data
+  useEffect(() => {
+    if (user) {
+      setReservation(prev => ({
+        ...prev,
+        name: prev.name || (user as any).name || '',
+        email: user.email
+      }));
+    }
+  }, [user]);
+
   const menuItems: MenuItem[] = menuData?.data || [];
 
   const handleAddToCart = (item: MenuItem) => {
@@ -79,6 +90,7 @@ export function RestaurantFrontend() {
     try {
       await createReservation({
         ...reservation,
+        user: user._id, // Link to the user ID from backend logic
         email: user.email,
         guests: Number(reservation.guests)
       }).unwrap();
