@@ -26,6 +26,14 @@ export const reservationApi = apiSlice.injectEndpoints({
             }),
             invalidatesTags: ["Reservation"],
         }),
+        updateReservation: builder.mutation({
+            query: ({ id, data }) => ({
+                url: `/reservations/${id}`,
+                method: "PUT", // or PATCH, but PUT is common for full updates
+                data,
+            }),
+            invalidatesTags: ["Reservation"],
+        }),
     }),
 });
 
@@ -34,4 +42,5 @@ export const {
     useGetAllReservationsQuery,
     useGetMyReservationsQuery,
     useUpdateReservationStatusMutation,
+    useUpdateReservationMutation,
 } = reservationApi;
