@@ -50,9 +50,9 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ navigate, scrollToSect
           <span>Est. 2024</span>
         </div>
 
-        <h1 className="text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] font-black text-white mb-10 leading-[0.85] tracking-tighter text-glow">
-          <span className="block italic font-light opacity-50 text-3xl sm:text-5xl tracking-[0.2em] mb-6 drop-shadow-lg">THE GOLDEN</span>
-          <span className="relative">
+        <h1 className="text-7xl sm:text-8xl md:text-9xl lg:text-[11rem] font-serif font-black text-white mb-10 leading-[0.85] tracking-tighter text-glow-gold">
+          <span className="block italic font-serif font-light opacity-50 text-3xl sm:text-5xl tracking-[0.2em] mb-6 drop-shadow-lg">THE GOLDEN</span>
+          <span className="relative text-transparent bg-clip-text bg-gradient-to-r from-white via-white to-kona-teal">
             SUNFLOWER
             <span className="absolute -inset-2 bg-kona-teal/20 blur-[60px] -z-10 rounded-full"></span>
           </span>
@@ -66,15 +66,15 @@ export const HeroSection: React.FC<HeroSectionProps> = ({ navigate, scrollToSect
         <div className="flex flex-col sm:flex-row gap-8 justify-center items-center mb-24">
           <button
             onClick={() => navigate('/menu')}
-            className="group relative px-14 py-6 bg-white text-slate-950 rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:scale-105 shadow-[0_0_50px_rgba(255,255,255,0.3)] hover:shadow-[0_0_70px_rgba(255,255,255,0.5)] active:scale-95">
+            className="group relative px-14 py-6 bg-gradient-to-r from-white via-white to-kona-pink text-slate-950 rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:scale-105 shadow-glow-gold active:scale-95">
             Discovery Menu
-            <div className="absolute inset-0 rounded-full border border-white/50 group-hover:scale-125 opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
+            <div className="absolute inset-0 rounded-full border border-kona-teal/40 group-hover:scale-125 opacity-0 group-hover:opacity-100 transition-all duration-700"></div>
           </button>
           <button
             onClick={() => scrollToSection('reservations')}
-            className="relative px-14 py-6 text-white border border-white/20 rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:bg-white/5 backdrop-blur-md overflow-hidden group">
+            className="relative px-14 py-6 text-white border border-kona-teal/30 hover:border-kona-teal rounded-full font-black text-xs uppercase tracking-[0.3em] transition-all hover:bg-white/5 backdrop-blur-md overflow-hidden group">
             <span className="relative z-10">Private Reservation</span>
-            <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:left-full transition-all duration-1000"></div>
+            <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-kona-teal/20 to-transparent group-hover:left-full transition-all duration-1000"></div>
           </button>
         </div>
 

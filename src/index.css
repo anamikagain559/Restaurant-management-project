@@ -34,7 +34,7 @@
     --ring: 215 20.2% 65.1%;
 
     --radius: 1.5rem;
-    --background: 355 100% 99%;
+    --background: 30 25% 98%;
   }
 
   :root[class~="dark"] {
@@ -76,7 +76,7 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
@@ -84,19 +84,19 @@
 @layer utilities {
   .bg-mesh {
     background-image: 
-      radial-gradient(at 0% 0%, hsla(355, 100%, 95%, 1) 0, transparent 50%), 
-      radial-gradient(at 50% 0%, hsla(180, 100%, 95%, 1) 0, transparent 50%), 
-      radial-gradient(at 100% 0%, hsla(355, 100%, 95%, 1) 0, transparent 50%),
+      radial-gradient(at 0% 0%, hsla(36, 100%, 96%, 1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(45, 100%, 96%, 1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(36, 100%, 96%, 1) 0, transparent 50%),
       radial-gradient(at 50% 50%, hsla(0, 0%, 100%, 1) 0, transparent 50%),
-      radial-gradient(at 0% 100%, hsla(180, 100%, 90%, 1) 0, transparent 50%),
-      radial-gradient(at 100% 100%, hsla(355, 100%, 90%, 1) 0, transparent 50%);
+      radial-gradient(at 0% 100%, hsla(36, 100%, 93%, 1) 0, transparent 50%),
+      radial-gradient(at 100% 100%, hsla(45, 100%, 93%, 1) 0, transparent 50%);
   }
 
   .bg-mesh-dark {
     background-image: 
-      radial-gradient(at 0% 0%, hsla(355, 40%, 10%, 1) 0, transparent 50%), 
-      radial-gradient(at 50% 0%, hsla(180, 40%, 10%, 1) 0, transparent 50%), 
-      radial-gradient(at 100% 0%, hsla(355, 40%, 10% , 1) 0, transparent 50%);
+      radial-gradient(at 0% 0%, hsla(36, 40%, 8%, 1) 0, transparent 50%), 
+      radial-gradient(at 50% 0%, hsla(45, 40%, 6%, 1) 0, transparent 50%), 
+      radial-gradient(at 100% 0%, hsla(36, 40%, 8%, 1) 0, transparent 50%);
   }
 
   .glass-panel {
@@ -111,8 +111,16 @@
     text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
   }
 
+  .text-glow-gold {
+    text-shadow: 0 0 15px rgba(217, 162, 65, 0.4);
+  }
+
+  .shadow-glow-gold {
+    box-shadow: 0 0 30px rgba(217, 162, 65, 0.2);
+  }
+
   .text-glow-maroon {
-    text-shadow: 0 0 15px rgba(100, 20, 40, 0.2);
+    text-shadow: 0 0 15px rgba(100, 20, 40, 0.1);
   }
 
   .animate-float {

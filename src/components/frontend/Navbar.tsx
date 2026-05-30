@@ -53,7 +53,7 @@ export const FrontendNavbar: React.FC<NavbarProps> = ({
           <div className="w-12 h-12 glass-card rounded-full p-1 border border-white/20 group-hover:border-kona-teal/50 transition-all">
             <img src={logo} alt="Logo" className="w-full h-full object-cover rounded-full" />
           </div>
-          <span className="text-2xl font-black tracking-tighter text-white text-glow uppercase">SUNFLOWER</span>
+          <span className="text-2xl font-serif font-black tracking-tighter text-white text-glow-gold uppercase">SUNFLOWER</span>
         </div>
 
         {/* Desktop Navigation - Centered */}

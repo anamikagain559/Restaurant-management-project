@@ -3,7 +3,7 @@ import { Leaf, Star, Wine } from 'lucide-react';
 
 export const AboutSection: React.FC = () => {
   return (
-    <section id="about" className="relative py-32 overflow-hidden bg-white">
+    <section id="about" className="relative py-32 overflow-hidden bg-kona-light">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-kona-teal/5 rounded-full blur-[120px] -z-10"></div>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
@@ -13,8 +13,8 @@ export const AboutSection: React.FC = () => {
               <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-6">
                 Biological Intelligence
               </div>
-              <h2 className="text-5xl md:text-6xl font-black text-kona-maroon mb-8 tracking-tighter uppercase leading-[0.9]">
-                Wholesome <br /> <span className="opacity-40">Innovation</span>
+              <h2 className="text-5xl md:text-6xl font-serif font-black text-kona-maroon mb-8 tracking-tighter uppercase leading-[0.9]">
+                Wholesome <br /> <span className="text-transparent bg-clip-text bg-gradient-to-r from-kona-maroon via-kona-maroon to-kona-teal opacity-90">Innovation</span>
               </h2>
               <p className="text-slate-600 mb-8 leading-relaxed font-medium text-lg">
                 Founded with a passion for organic vibrancy, SUNFLOWER is a
@@ -43,7 +43,7 @@ export const AboutSection: React.FC = () => {
           </div>
           <div className="relative order-1 lg:order-2">
             <div className="absolute inset-0 bg-mesh opacity-20 blur-3xl -z-10"></div>
-            <div className="aspect-[4/5] rounded-[4rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.1)] border-8 border-white group">
+            <div className="aspect-[4/5] rounded-[4rem] overflow-hidden shadow-[0_40px_100px_rgba(217,162,65,0.05)] border-8 border-white group">
               <div 
                 className="w-full h-full bg-kona-light flex items-center justify-center bg-cover bg-center group-hover:scale-110 transition-transform duration-1000 grayscale-[0.2] hover:grayscale-0"
                 style={{ backgroundImage: `url('https://i.ibb.co.com/nq1CgR1W/restaurant-decoration.jpg')` }}

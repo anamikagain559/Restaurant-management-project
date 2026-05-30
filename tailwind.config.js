@@ -12,6 +12,10 @@ module.exports = {content: [
       },
     },
     extend: {
+      fontFamily: {
+        serif: ["'Playfair Display'", 'serif'],
+        sans: ["'Plus Jakarta Sans'", 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -47,10 +51,10 @@ module.exports = {content: [
           foreground: "hsl(var(--card-foreground))",
         },
         kona: {
-          pink: "#FCD5D9",
-          teal: "#00A18E",
-          maroon: "#8E3E4B",
-          light: "#FFF5F6",
+          pink: "#F5EAD4",
+          teal: "#D9A241",
+          maroon: "#151311",
+          light: "#FAF7F2",
         }
       },
       borderRadius: {
