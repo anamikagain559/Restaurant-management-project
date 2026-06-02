@@ -18,7 +18,7 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
   addToCart
 }) => {
   return (
-    <section id="menu" className="py-32 bg-slate-50 overflow-hidden relative">
+    <section id="menu" className="py-32 bg-kona-light overflow-hidden relative">
       <div className="absolute top-1/2 left-0 w-96 h-96 bg-kona-pink/10 rounded-full blur-[100px] -z-10 animate-pulse"></div>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
@@ -26,8 +26,8 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
             <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-4">
               Curated Cart
             </div>
-            <h2 className="text-5xl md:text-7xl font-black text-kona-maroon tracking-tighter uppercase leading-[0.85]">
-              Discovery <br /> <span className="text-kona-teal">Prototypes</span>
+            <h2 className="text-5xl md:text-7xl font-serif font-black text-kona-maroon tracking-tighter uppercase leading-[0.85]">
+              Discovery <br /> <span className="text-kona-teal italic font-light">Prototypes</span>
             </h2>
           </div>
           <p className="text-slate-500 font-medium max-w-sm text-right hidden md:block">
@@ -43,7 +43,7 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
               onClick={() => setActiveCategory(category)}
               className={`
                 px-8 py-3 rounded-full text-[10px] font-black uppercase tracking-[0.2em] transition-all duration-500
-                ${activeCategory === category ? 'bg-kona-maroon text-white shadow-[0_0_30px_rgba(0,0,0,0.2)] scale-110' : 'bg-white text-slate-400 hover:text-kona-maroon border border-slate-100 hover:bg-slate-50'}
+                ${activeCategory === category ? 'bg-kona-maroon text-kona-teal shadow-glow-gold scale-110' : 'bg-white/80 text-slate-500 hover:text-kona-teal border border-kona-teal/20 hover:border-kona-teal/50 hover:bg-white'}
               `}>
               {category}
             </button>
@@ -103,7 +103,7 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
                 {/* Content Section */}
                 <div className="p-8 pt-2 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-black text-kona-maroon group-hover:text-kona-teal transition-colors tracking-tighter uppercase leading-tight">
+                    <h3 className="text-xl font-serif font-black text-kona-maroon group-hover:text-kona-teal transition-colors tracking-tighter uppercase leading-tight">
                       {item.name}
                     </h3>
                   </div>
@@ -115,7 +115,7 @@ export const MenuPreviewSection: React.FC<MenuPreviewSectionProps> = ({
                   <div className="mt-auto flex items-center justify-between pt-6 border-t border-slate-100/50">
                     <div className="flex flex-col">
                       <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Price Unit</span>
-                      <span className="text-2xl font-black text-slate-900">
+                      <span className="text-2xl font-black text-kona-teal">
                         ${item.price.toFixed(2)}
                       </span>
                     </div>

@@ -27,7 +27,7 @@ export function Menu() {
   });
 
   return (
-    <div className="overflow-hidden bg-slate-50">
+    <div className="overflow-hidden bg-kona-light">
       {/* Hero Section - AI Premium */}
       <section className="relative pt-64 pb-32 overflow-hidden bg-slate-950">
         <div className="absolute inset-0 z-0">
@@ -47,7 +47,7 @@ export function Menu() {
                Biological Cart
              </span>
           </div>
-          <h1 className="text-6xl md:text-8xl font-black text-white mb-8 tracking-tighter uppercase leading-[0.85] text-glow">
+          <h1 className="text-6xl md:text-8xl font-serif font-black text-white mb-8 tracking-tighter uppercase leading-[0.85] text-glow-gold">
             Discovery <br/> <span className="text-kona-teal italic font-light drop-shadow-lg">Prototypes</span>
           </h1>
           <p className="max-w-2xl mx-auto text-white/40 text-lg font-light leading-relaxed italic">
@@ -62,7 +62,7 @@ export function Menu() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-6 -mt-10 relative z-20 pb-32">
         {/* Search and Filters */}
-        <div className="bg-white p-6 rounded-[3rem] shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-slate-100 flex flex-col lg:flex-row items-center gap-8 mb-20 relative overflow-hidden group">
+        <div className="bg-white/70 backdrop-blur-xl p-6 rounded-[3rem] shadow-glow-gold border border-kona-teal/15 flex flex-col lg:flex-row items-center gap-8 mb-20 relative overflow-hidden group">
           <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-kona-teal/50 to-transparent"></div>
           
           <div className="flex-1 w-full lg:w-auto relative">
@@ -70,7 +70,7 @@ export function Menu() {
             <input 
               type="text" 
               placeholder="Search Biological Cart..."
-              className="w-full pl-14 pr-6 py-5 bg-slate-50 rounded-2xl border border-slate-100 focus:border-kona-teal/50 focus:ring-4 focus:ring-kona-teal/10 outline-none transition-all font-medium text-slate-800 placeholder:text-slate-400 text-sm"
+              className="w-full pl-14 pr-6 py-5 bg-white rounded-2xl border border-kona-teal/15 focus:border-kona-teal/40 focus:ring-4 focus:ring-kona-teal/5 outline-none transition-all font-medium text-slate-800 placeholder:text-slate-400 text-sm"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -85,8 +85,8 @@ export function Menu() {
                   className={`
                     px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] whitespace-nowrap transition-all duration-500
                     ${activeCategory === category 
-                      ? 'bg-slate-950 text-white shadow-xl scale-105' 
-                      : 'text-slate-500 hover:text-slate-900 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300'
+                      ? 'bg-kona-maroon text-kona-teal shadow-glow-gold scale-105' 
+                      : 'text-slate-500 hover:text-kona-teal bg-white/80 hover:bg-white border border-kona-teal/20 hover:border-kona-teal/50'
                     }
                   `}
                 >
@@ -155,7 +155,7 @@ export function Menu() {
                 {/* Content Section */}
                 <div className="p-8 pt-2 flex flex-col flex-1">
                   <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-xl font-black text-kona-maroon group-hover:text-kona-teal transition-colors tracking-tighter uppercase leading-tight line-clamp-1">
+                    <h3 className="text-xl font-serif font-black text-kona-maroon group-hover:text-kona-teal transition-colors tracking-tighter uppercase leading-tight line-clamp-1">
                       {item.name}
                     </h3>
                   </div>
@@ -167,7 +167,7 @@ export function Menu() {
                   <div className="mt-auto flex items-center justify-between pt-6 border-t border-slate-100/50">
                     <div className="flex flex-col">
                       <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest mb-1">Price Unit</span>
-                      <span className="text-2xl font-black text-slate-900">
+                      <span className="text-2xl font-black text-kona-teal">
                         ${item.price.toFixed(2)}
                       </span>
                     </div>

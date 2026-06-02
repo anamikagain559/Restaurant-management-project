@@ -42,7 +42,7 @@ export const FrontendFooter: React.FC<FooterProps> = ({ navItems, scrollToSectio
                 />
               </div>
               <div>
-                <h3 className="text-4xl font-black tracking-tighter text-glow uppercase mb-1">SUNFLOWER</h3>
+                <h3 className="text-4xl font-serif font-black tracking-tighter text-glow-gold uppercase mb-1">SUNFLOWER</h3>
                 <div className="flex items-center gap-3">
                   <span className="h-px w-6 bg-kona-teal"></span>
                   <span className="text-[9px] font-black uppercase tracking-[0.4em] text-white/40">Premium Collective</span>

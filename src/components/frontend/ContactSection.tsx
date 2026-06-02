@@ -3,15 +3,15 @@ import { MapPin, Clock, Phone } from 'lucide-react';
 
 export const ContactSection: React.FC = () => {
   return (
-    <section id="contact" className="py-32 bg-white relative overflow-hidden">
+    <section id="contact" className="py-32 bg-kona-light relative overflow-hidden">
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-kona-teal/5 rounded-full blur-[100px] -z-10"></div>
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
         <div className="text-center mb-24">
           <div className="text-kona-teal font-black tracking-[0.4em] uppercase text-[10px] mb-6">
             Contact Nodes
           </div>
-          <h2 className="text-5xl md:text-7xl font-black text-kona-maroon mb-4 tracking-tighter uppercase leading-[0.85]">
-            System <span className="opacity-40">Locations</span>
+          <h2 className="text-5xl md:text-7xl font-serif font-black text-kona-maroon mb-4 tracking-tighter uppercase leading-[0.85]">
+            System <span className="text-kona-teal italic font-light">Locations</span>
           </h2>
         </div>
 
@@ -35,7 +35,7 @@ export const ContactSection: React.FC = () => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="glass-panel p-10 rounded-[3rem] text-center hover:bg-slate-50 transition-all border border-slate-100 group shadow-lg hover:shadow-2xl">
+              className="glass-panel p-10 rounded-[3rem] text-center bg-white/70 hover:bg-white transition-all border border-kona-teal/15 hover:border-kona-teal/40 group shadow-lg hover:shadow-glow-gold">
               <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-sm group-hover:rotate-12 transition-transform">
                 <item.icon className="w-8 h-8 text-kona-teal" />
               </div>

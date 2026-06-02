@@ -41,9 +41,9 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               </span>
             </div>
             
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black text-white mb-10 tracking-tighter uppercase leading-[0.85]">
-              <span className="block italic font-light text-white/50 text-2xl md:text-3xl tracking-[0.2em] mb-4">SECURE YOUR</span>
-              <span className="relative bg-gradient-to-br from-white via-white to-kona-teal bg-clip-text text-transparent drop-shadow-[0_10px_30px_rgba(0,161,142,0.3)]">
+            <h2 className="text-5xl md:text-7xl lg:text-8xl font-serif font-black text-white mb-10 tracking-tighter uppercase leading-[0.85]">
+              <span className="block italic font-serif font-light text-white/50 text-2xl md:text-3xl tracking-[0.2em] mb-4">SECURE YOUR</span>
+              <span className="relative bg-gradient-to-br from-white via-white to-kona-teal bg-clip-text text-transparent drop-shadow-[0_10px_30px_rgba(217,162,65,0.3)]">
                 GUEST EXPERIENCE
                 <span className="absolute -inset-x-8 top-1/2 -translate-y-1/2 h-20 bg-kona-teal/5 blur-[60px] -z-10 rounded-full"></span>
               </span>
@@ -133,11 +133,11 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({
               <button
                 type="submit"
                 disabled={isReserving}
-                className="md:col-span-2 relative group mt-4 h-24 w-full overflow-hidden rounded-full bg-white font-black text-[12px] uppercase tracking-[0.5em] text-slate-950 transition-all duration-700 hover:scale-105 shadow-[0_20px_50px_rgba(255,255,255,0.15)] hover:shadow-[0_30px_80px_rgba(0,161,142,0.4)] hover:bg-white/90 disabled:opacity-50"
+                className="md:col-span-2 relative group mt-4 h-24 w-full overflow-hidden rounded-full bg-gradient-to-r from-kona-teal via-white to-kona-teal font-black text-[12px] uppercase tracking-[0.5em] text-slate-950 transition-all duration-700 hover:scale-105 shadow-[0_20px_50px_rgba(217,162,65,0.15)] hover:shadow-[0_30px_80px_rgba(217,162,65,0.4)] disabled:opacity-50"
               >
                 <div className="relative z-10 flex items-center justify-center gap-4">
                   {isReserving ? 'PROCESSING SEQUENCE...' : 'CONFIRM RESERVATION'}
-                  {!isReserving && <span className="w-1.5 h-1.5 rounded-full bg-kona-teal animate-ping"></span>}
+                  {!isReserving && <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping"></span>}
                 </div>
                 <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-kona-teal/20 to-transparent transition-all duration-1000 group-hover:left-full"></div>
               </button>
